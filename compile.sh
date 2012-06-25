@@ -1,15 +1,17 @@
 #!/bin/bash
-xterm -title 'Configure to Compile Modules and Kernel' -e '
+xterm -title 'Configure to Compile Modules and Kernel' -e "
 rm -Rf ./Kernel_OutPut ./Modules_OutPut; mkdir logs; clear
 mkdir ./Kernel_OutPut
 mkdir -p ./Modules_OutPut/system/lib/modules
 
-#Android Toolchain PATH
+# SET ARCHTETURE
 export ARCH=arm
-export SUBARCH=arm
-export CCOMPILE=$CROSS_COMPILE
+
+# SET CROSS_COMPILE prefix-
 export CROSS_COMPILE=arm-eabi-
-export PATH=$PATH:$PWD/platform_prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin
+
+# PATH TO CROSS_COMPILER BINARY FOLDER
+export PATH=$PATH:$PWD/toolchain/arm-eabi-4.4.3/bin
 
 cd common
 
@@ -20,7 +22,7 @@ else
 fi
 	make xconfig && make -j3 modules CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-modules.log
 	find . ../modules -name '*.ko' -exec cp -v {} ../Modules_OutPut/system/lib/modules \;
-	echo "Modules Compiled and stored in folder ./Modules_OutPut"; echo "Hit <Enter> to compile Kernel"; read
+	echo 'Modules Compiled and stored in folder ./Modules_OutPut'; echo 'Hit <Enter> to compile Kernel'; read
 	make clean && make -j3 zImage CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-kernel.log
 
 cd ..
@@ -28,8 +30,8 @@ cd ..
 cp ./common/arch/arm/boot/zImage ./Kernel_OutPut/
 
 if [ -f ./Kernel_OutPut/zImage ]; then
-	echo "Kernel Compiled and stored in folder ./Kernel_OutPut"
+	echo 'Kernel Compiled and stored in folder ./Kernel_OutPut'
 else
-	echo "Compile Fail"
+	echo 'Compile Fail'
 fi
-echo "Hit <Enter> to continue!!!"; read'
+echo 'Hit <Enter> to continue!!!'; read"
