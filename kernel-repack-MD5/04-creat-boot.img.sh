@@ -7,11 +7,11 @@ else
 fi
 cd mkbootimg
 if [ -f ../boot.img-ramdisk.gz ] && [ -f ../boot.img-kernel ]; then
-	rm md5 md5out
 	md5sum ../boot.img-kernel > md5
 	dd if=md5 of=md5out bs=1 seek=0 count=32
 	rm ../boot.img ../PDA-kernel.tar; clear; sleep 5
 	./mkbootimg --kernel ../boot.img-kernel --kernelMD5 'cat md5out' --ramdisk ../boot.img-ramdisk.gz --base 0x81600000 -o ../boot.img
+	rm md5 md5out
 else
 	echo 'cant read files'; sleep 5; exit
 fi

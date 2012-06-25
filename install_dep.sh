@@ -3,7 +3,7 @@ xterm -title 'Install dependencies' -e "
 
 sudo apt-get update && sudo apt-get upgrade
 
-sudo apt-get install git qt3-dev-tools g++ ia32-libs
+sudo apt-get install qt3-dev-tools g++ ia32-libs
 
 sudo apt-get clean && sudo apt-get autoremove
 
