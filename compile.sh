@@ -16,11 +16,11 @@ export PATH=$PATH:$PWD/toolchain/arm-eabi-4.4.3/bin
 cd common
 
 if [ -f .config ]; then
-	make clean
+	make clean 
 else
 	make distclean && make bcm21553_cooperve_defconfig && make silentoldconfig
 fi
-	make xconfig && make -j3 modules CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-modules.log
+	make xconfig && make silentoldconfig && make -j3 modules CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-modules.log
 	find . ../modules -name '*.ko' -exec cp -v {} ../Modules_OutPut/system/lib/modules \;
 	echo 'Modules Compiled and stored in folder ./Modules_OutPut'; echo 'Hit <Enter> to compile Kernel'; read
 	make clean && make -j3 zImage CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-kernel.log

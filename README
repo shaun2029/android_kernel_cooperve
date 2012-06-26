@@ -1,6 +1,6 @@
 	Kernel Samsung GT-S5830C-i-M derivations
 	----------------------------------------
-To compile kernel use xubuntu x86_64
+To compile kernel use Xubuntu x86_64
 
 1 execute install_dep.sh to install the packages needed to compile kernel.
 2 execute compile.sh, to configure and compile kernel.
