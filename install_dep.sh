@@ -4,8 +4,8 @@ xterm -title 'Install dependencies' -e "
 sudo apt-get update && sudo apt-get upgrade
 
 if [ '$(uname -m)' = 'x86_64' ]; then
-	sudo apt-get install gnupg openjdk-6-jdk flex bison gperf libsdl1.2-dev \
-	libesd0-dev libwxgtk2.6-dev build-essential dpkg-cross qt3-dev-tools lzma \
+	sudo apt-get install gnupg openjdk-6-jdk flex bison gperf libsdl1.2-dev perl sparse \
+	original-awk libesd0-dev libwxgtk2.6-dev build-essential dpkg-cross qt3-dev-tools lzma \
 	gzip zip curl libncurses5-dev zlib1g-dev ia32-libs lib32z1-dev lib32ncurses5-dev \
 	gcc-multilib g++-multilib binutils-arm-linux-gnueabi cpp-4.4-arm-linux-gnueabi \
 	gobjc++-4.4-arm-linux-gnueabi gobjc-4.4-arm-linux-gnueabi gcc-4.4-arm-linux-gnueabi \
@@ -13,8 +13,8 @@ if [ '$(uname -m)' = 'x86_64' ]; then
 	libobjc2-armel-cross libgomp1-armel-cross libgcc1-armel-cross libc6-dev-armel-cross \
 	libc6-armel-cross libgcc1-armel-cross libc6-dev-armel-cross libstdc++6-armel-cross
 else
-	sudo apt-get install gnupg openjdk-6-jdk flex bison gperf libsdl1.2-dev \
-	libesd0-dev libwxgtk2.6-dev build-essential dpkg-cross qt3-dev-tools lzma \
+	sudo apt-get install gnupg openjdk-6-jdk flex bison gperf libsdl1.2-dev perl sparse \
+	original-awk libesd0-dev libwxgtk2.6-dev build-essential dpkg-cross qt3-dev-tools lzma \
 	gzip zip curl libncurses5-dev zlib1g-dev binutils-arm-linux-gnueabi cpp-4.4-arm-linux-gnueabi \
 	gobjc++-4.4-arm-linux-gnueabi gobjc-4.4-arm-linux-gnueabi gcc-4.4-arm-linux-gnueabi \
 	g++-4.4-arm-linux-gnueabi gcc-4.4-arm-linux-gnueabi-base libstdc++6-4.4-dev-armel-cross \
