@@ -3,16 +3,15 @@ xterm -title 'Clean all' -e "
 
 rm -Rf ./Kernel_OutPut/ ./Modules_OutPut/ ./logs/ ./kernel-repack-MD5/PDA-kernel.tar ./kernel-repack-MD5/boot.im* ./kernel-repack-MD5/ramdisk/; clear
 
-# SET ARCHTETURE
+if [ -f /usr/bin/arm-linux-gnueabi-gcc ] && [ -f /usr/bin/arm-linux-gnueabi-gcov ] && [ -f /usr/bin/arm-linux-gnueabi-g++ ] && [ -f /usr/bin/arm-linux-gnueabi-cpp ]; then
+	export CROSS_COMPILE=/usr/bin/arm-linux-gnueabi-
+else
+	export CROSS_COMPILE=$PWD/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
+fi
+
 export ARCH=arm
-
-# SET CROSS_COMPILE prefix-
-#export CROSS_COMPILE=arm-linux-gnueabi-
-export CROSS_COMPILE=arm-eabi-
-
-# PATH TO CROSS_COMPILER BINARY FOLDER
-export PATH=$PATH:/usr/bin
-export PATH=$PATH:$PWD/toolchain/arm-eabi-4.4.3/bin
+export CCOMPILER=$CROSS_COMPILE
 
 cd common
+
 make distclean; echo 'compilations and configurations clear!!!'; sleep 5"
