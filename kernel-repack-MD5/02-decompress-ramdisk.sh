@@ -10,9 +10,11 @@ else
 	else
 		if [ -f boot.img-ramdisk.gz ]; then
 			mkdir ramdisk && cd ramdisk && gzip -dc ../boot.img-ramdisk.gz | cpio -i; strings fsr.ko | grep vermagic; cd ..
+			rm boot.img-ramdisk.gz
 		fi
 		if [ -f boot.img-ramdisk.lzma ]; then
 			mkdir ramdisk && cd ramdisk && lzma -dc ../boot.img-ramdisk.lzma | cpio -i; strings fsr.ko | grep vermagic; cd ..
+			rm boot.img-ramdisk.lzma
 		fi
 	fi
 fi

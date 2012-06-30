@@ -12,6 +12,8 @@ if [ -f ../boot.img ]; then
 else
 	echo 'cant read file'; sleep 5; exit
 fi
-perl split_bootimg.pl ../boot.img
-mv boot.img-kernel boot.img-ramdisk.gz ../
+perl split_bootimg.pl ../boot.img && rm ../boot.img
+mv boot.img-kernel ../
+gzip -t -v boot.img-ramdisk.gz && mv boot.img-ramdisk.gz ../; clear
+lzma -t -v boot.img-ramdisk.gz && mv boot.img-ramdisk.gz ../boot.img-ramdisk.lzma; clear
 echo 'hit <Enter> to continue'; read

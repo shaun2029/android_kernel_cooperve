@@ -23,11 +23,11 @@ else
 		echo ' --ramdisk ../boot.img-ramdisk.lzma --base 0x81600000 -o ../boot.img' >> run.sh
 	fi
 fi
-rm ../boot.img ../PDA-kernel.tar; clear; sleep 5
 if [ -f run.sh ] && [ -f md5 ]; then
+	rm ../boot.img ../PDA-kernel.tar; clear; sleep 5
 	chmod +x run.sh mkbootimg && ./run.sh && rm run.sh md5
 	cd ..
-	tar -cvf PDA-kernel.tar boot.img
+	tar -cvf PDA-kernel.tar boot.img && rm boot.img-ramdisk.lzma boot.img-ramdisk.gz boot.img-kernel; clear
 	echo 'PDA-kernel <-> READY'
 else
 	echo 'boot.img not created!!!'
