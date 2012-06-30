@@ -1,5 +1,5 @@
 #!/bin/bash
-xterm -title 'MERGE RANDISK AND zImage TO boot.img' -e "
+
 if [ -f zImage ] && [ boot.img-kernel ]; then
 rm boot.img-kernel; clear; mv zImage boot.img-kernel; clear
 else
@@ -19,4 +19,4 @@ chmod +x run.sh mkbootimg && ./run.sh && rm run.sh md5
 cd ..
 tar -cvf PDA-kernel.tar boot.img
 echo 'PDA-kernel <-> READY'
-echo 'hit <Enter> to close!'; read"
+echo 'hit <Enter> to close!'; read

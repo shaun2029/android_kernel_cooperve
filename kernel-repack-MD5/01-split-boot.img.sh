@@ -1,5 +1,5 @@
 #!/bin/sh
-xterm -title 'SPLIT boot.img to RAMDISK and KERNEL' -e "
+
 if [ -f ./boot.img ]; then
 	echo 'now split boot.img'; sleep 5
 else
@@ -14,4 +14,4 @@ else
 fi
 perl split_bootimg.pl ../boot.img
 mv boot.img-kernel boot.img-ramdisk.gz ../
-echo 'hit <Enter> to continue'; read"
+echo 'hit <Enter> to continue'; read

@@ -1,5 +1,5 @@
 #!/bin/bash
-xterm -title 'Creat boot.img' -e "
+
 if [ -f /usr/bin/abootimg ]; then
 	if [ -f config.cfg ] && [ -f zImage ] && [ -f initrd.img ]; then
 		rm boot.img PDA-kernel.tar; clear; sleep 5
@@ -11,4 +11,4 @@ else
 	echo 'need install abootimg, whait install and run this again!!!'; sleep 5
 	sudo apt-get install abootimg
 fi
-echo 'Hit <Enter> to close!!!'; read"
+echo 'Hit <Enter> to close!!!'; read

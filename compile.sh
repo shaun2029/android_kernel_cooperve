@@ -1,17 +1,11 @@
 #!/bin/bash
-xterm -title 'Configure to Compile Modules and Kernel' -e "
 
 rm -Rf ./Kernel_OutPut ./Modules_OutPut; mkdir logs; clear
 mkdir ./Kernel_OutPut
 mkdir -p ./Modules_OutPut/system/lib/modules
 
-if [ -f /usr/bin/arm-linux-gnueabi-gcc ] && [ -f /usr/bin/arm-linux-gnueabi-gcov ] && [ -f /usr/bin/arm-linux-gnueabi-g++ ] && [ -f /usr/bin/arm-linux-gnueabi-cpp ]; then
-	export CROSS_COMPILE=/usr/bin/arm-linux-gnueabi-
-else
-	export CROSS_COMPILE=$PWD/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
-fi
-
 export ARCH=arm
+export CROSS_COMPILE=$PWD/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
 export CCOMPILER=$CROSS_COMPILE
 
 cd common
@@ -38,4 +32,4 @@ if [ -f ./Kernel_OutPut/zImage ]; then
 else
 	echo 'Compile Fail'
 fi
-echo 'Hit <Enter> to continue!!!'; read"
+echo 'Hit <Enter> to continue!!!'; read
