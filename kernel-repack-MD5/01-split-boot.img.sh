@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ -f ./boot.img ]; then
 	echo 'now split boot.img'; sleep 5
@@ -8,7 +8,7 @@ else
 fi
 cd mkbootimg
 if [ -f ../boot.img ]; then
-	rm ../boot.img-ramdisk.gz ../boot.img-kernel; clear; sleep 5
+	rm ../boot.img-ramdisk.gz ../boot.img-ramdisk.lzma ../boot.img-kernel; clear; sleep 5
 else
 	echo 'cant read file'; sleep 5; exit
 fi
