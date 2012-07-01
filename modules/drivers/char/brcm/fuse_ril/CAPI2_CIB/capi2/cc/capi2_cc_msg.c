@@ -607,7 +607,8 @@ xdr_CC_NotifySsInd_t(XDR *xdrs, CC_NotifySsInd_t *args)
 
 	if( 
 		xdr_SS_NotifySs_t(xdrs,  &args->notifySs) &&
-		xdr_opaque(xdrs, (caddr_t) args->facIeBuf, 255 ) 
+		xdr_opaque(xdrs, (caddr_t) args->facIeBuf, 255 ) &&
+		XDR_ENUM(xdrs, &(args->callType), CCallType_t)
 		
 	  )
 		return(TRUE);

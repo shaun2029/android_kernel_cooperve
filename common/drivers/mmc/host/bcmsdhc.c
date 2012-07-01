@@ -32,6 +32,8 @@
 #include <linux/pm_qos_params.h>
 #include <linux/regulator/consumer.h>
 
+#include <linux/mfd/max8986/max8986.h>
+
 #ifndef CONFIG_ARCH_BCM215XX
 #include <mach/reg_sdio.h>
 #else
@@ -63,6 +65,43 @@ int sdio_remove_qos_req(struct bcmsdhc_host *host);
 
 
 bool sd_inserted = 0;
+
+struct regulator_dev {
+	struct regulator_desc *desc;
+	int use_count;
+	int open_count;
+	int exclusive;
+
+	/* lists we belong to */
+	struct list_head list; /* list of all regulators */
+	struct list_head slist; /* list of supplied regulators */
+
+	/* lists we own */
+	struct list_head consumer_list; /* consumers we supply */
+	struct list_head supply_list; /* regulators we supply */
+
+	struct blocking_notifier_head notifier;
+	struct mutex mutex; /* consumer lock */
+	struct module *owner;
+	struct device dev;
+	struct regulation_constraints *constraints;
+	struct regulator_dev *supply;	/* for tree */
+
+	void *reg_data;		/* regulator_dev data */
+};
+
+struct regulator {
+	struct device *dev;
+	struct list_head list;
+	int uA_load;
+	int min_uV;
+	int max_uV;
+	char *supply_name;
+	struct device_attribute dev_attr;
+	struct regulator_dev *rdev;
+};
+
+
 /* *************************************************************************************************** */
 /* Function Name: bcmsdhc_dumpregs */
 /* Description: This function is for logging register of SDHC */
@@ -170,6 +209,8 @@ static void bcmsdhc_init(struct bcmsdhc_host *host, u32 mask)
 	writew((0xFFFF & ~ERR_INT_STATUS_VENDOR),
 	       host->ioaddr + SDHC_ERROR_INT_SIGNAL_ENABLE);
 
+	writew(0, host->ioaddr + SDHC_NORMAL_INT_SIGNAL_ENABLE);
+	
 	intmask =
 	    (NORMAL_INT_ENABLE_CMD_COMPLETE | NORMAL_INT_ENABLE_TRX_COMPLETE |
 	     NORMAL_INT_ENABLE_BLOCK_GAP | NORMAL_INT_ENABLE_DMA |
@@ -988,7 +1029,8 @@ static void bcmsdhc_send_command(struct bcmsdhc_host *host,
 	int_status_en &=
 	    ~(NORMAL_INT_ENABLE_CMD_COMPLETE | NORMAL_INT_ENABLE_TRX_COMPLETE |
 	      NORMAL_INT_ENABLE_BLOCK_GAP | NORMAL_INT_ENABLE_DMA |
-	      NORMAL_INT_ENABLE_BUF_WRITE_RDY | NORMAL_INT_ENABLE_BUF_READ_RDY);
+	      NORMAL_INT_ENABLE_BUF_WRITE_RDY | NORMAL_INT_ENABLE_BUF_READ_RDY|
+	      NORMAL_INT_ENABLE_BTACKRXEN	|	NORMAL_INT_ENABLE_BTIRQ	);
 
 	if (cmd->data == NULL) {
 		int_status_en |= NORMAL_INT_ENABLE_CMD_COMPLETE;
@@ -1275,8 +1317,7 @@ static void bcmsdhc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 #ifdef CONFIG_REGULATOR
 		if(host->vcc) {
 			/* Disable regulator here */
-			DBG(KERN_INFO "SDHC:Slot[%d]=> regulator_disable\n", host->sdhc_slot);
-			/* needed only in TBE5, build switch will be placed here */
+			printk(KERN_INFO "SDHC:Slot[%d]=> regulator_disable\n", host->sdhc_slot);
 			/* regulator_disable(host->vcc); */
 		}
 #endif
@@ -1284,7 +1325,7 @@ static void bcmsdhc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	case MMC_POWER_UP:
 #ifdef CONFIG_REGULATOR
 		if (host->vcc) {
-			DBG(KERN_INFO "SDHC:Slot[%d]=> regulator_enable\n", host->sdhc_slot);
+			printk(KERN_INFO "SDHC:Slot[%d]=> regulator_enable\n", host->sdhc_slot);
 			result = regulator_enable(host->vcc);
 		}
 #endif
@@ -1386,7 +1427,7 @@ static void bcmsdhc_enable_sdio_irq(struct mmc_host *mmc, int enable)
 
 	ier = readl(host->ioaddr + SDHC_NORMAL_INT_STATUS_ENABLE);
 
-	ier &= ~NORMAL_INT_ENABLE_CARD_INT;
+	ier &= ~(NORMAL_INT_ENABLE_CARD_INT|NORMAL_INT_ENABLE_BTACKRXEN|NORMAL_INT_ENABLE_BTIRQ);			
 	host->enable_sdio_interrupt = false;
 
 	tmp2 = readl(host->ioaddr + SDHC_NORMAL_INT_SIGNAL_ENABLE);
@@ -1409,8 +1450,23 @@ out:
 int bcmsdhc_get_cd(struct mmc_host *mmc_host)
 {
 	struct bcmsdhc_host *host;
+	int state;
 
 	host = mmc_priv(mmc_host);
+
+	//check GPIO value connected to SD
+	if(host->irq_cd>0)
+	{
+		state = gpio_get_value(host->irq_cd);	
+		if (state != (host->bcm_plat->flags & SDHC_CARD_DETECT_ACTIVE_HIGH)) 
+		{
+			pr_info("%s: %s: SD Card removed physically <-->host->card_present:%d!\n",__func__, mmc_hostname(host->mmc),host->card_present);
+		} 
+		else 
+		{
+			pr_info("%s: %s: SD Card Inserted physically<-->host->card_present:%d\n",__func__, mmc_hostname(host->mmc),host->card_present);
+		}	
+	}
 
 	if (host->card_present == false) {
 		return 0; /* Card removed */
@@ -1447,6 +1503,7 @@ static void bcmsdhc_tasklet_card(unsigned long param)
 	struct bcmsdhc_host *host;
 	unsigned long flags;
 	int state;
+	int result = 0;
 
 	host = (struct bcmsdhc_host *)param;
 	state = gpio_get_value(host->irq_cd);
@@ -1472,6 +1529,29 @@ static void bcmsdhc_tasklet_card(unsigned long param)
 	sd_inserted = host->card_present;
 
 	spin_unlock_irqrestore(&host->lock, flags);
+
+	// When the card is rejrcted, the sd power should turn on!
+	// struct regulator *regulator_get(struct device *dev, const char *id)
+	if(!host->card_present)
+	{
+		if(!strcmp(mmc_hostname(host->mmc), "mmc1"))
+		{
+			if(host->vcc)
+			{
+			/* 	-------------------------------------------------------------------------------------------- */
+			/*	printk(KERN_INFO "%s's vreg: Name %s / Use Count %d / Open Count %d\n", mmc_hostname(host->mmc), 
+						host->vcc->supply_name, host->vcc->rdev->use_count, host->vcc->rdev->open_count); */
+			/*	-------------------------------------------------------------------------------------------- */
+				result = regulator_enable(host->vcc);
+				printk(KERN_INFO "%s's vreg[Turn On]: Name %s / Use Count %d / Open Count %d / Result %d\n", mmc_hostname(host->mmc),
+							host->vcc->supply_name, host->vcc->rdev->use_count, host->vcc->rdev->open_count, result);
+
+			if(host->vcc->rdev->use_count > 65535) 
+				host->vcc->rdev->use_count = 0;
+			}
+		}
+	}
+
 	mmc_detect_change(host->mmc, msecs_to_jiffies(500));
 }
 
@@ -1786,6 +1866,12 @@ static irqreturn_t bcmsdhc_irq(int irq, void *dev_id)
 
 	spin_lock(&host->lock);
 
+	/* Enable the clock here in case we receive an interrupt after
+	 * timeout_timer is called, a very corner case. We call disable
+	 * at the end of ISR to balance this.
+	 */
+	clk_enable(host->bus_clk);
+
 	wIntStatus = readw(host->ioaddr + SDHC_NORMAL_INT_STATUS);
 
 	if (wIntStatus != 0) {
@@ -1919,6 +2005,27 @@ static irqreturn_t bcmsdhc_irq(int irq, void *dev_id)
 			pr_info("%s: Unexpected interrupt 0x%08x.\n",
 				 mmc_hostname(host->mmc), wIntStatus);
 			bcmsdhc_dumpregs(host);
+			
+			if((wIntStatus&NORMAL_INT_ENABLE_BTACKRXEN) ||(wIntStatus&NORMAL_INT_ENABLE_BTIRQ)){	   
+				u16 int_status_en = 0;
+				int i;
+				char sd_reg_num=32;
+
+				pr_info("SD[%d]-slot Register Dump - start\n", host->sdhc_slot);
+				
+				for(i=0;i<sd_reg_num;i++){
+					pr_info("[0x%x]:0x%x\n",(unsigned int)(host->ioaddr+i*4),readl(host->ioaddr+i*4));
+				}
+				
+				pr_info("SD Register Dump - complete\n");
+
+				
+				int_status_en = readw(host->ioaddr + SDHC_NORMAL_INT_STATUS_ENABLE);
+				int_status_en &= ~(NORMAL_INT_ENABLE_BTACKRXEN|NORMAL_INT_ENABLE_BTIRQ);
+				writew(int_status_en, host->ioaddr + SDHC_NORMAL_INT_STATUS_ENABLE);
+				bcmsdhc_reset(host, SOFT_RESET_CMD);
+				bcmsdhc_reset(host, SOFT_RESET_DAT);
+			}
 			writel(wIntStatus,
 				   host->ioaddr + SDHC_NORMAL_INT_STATUS);
 		}
@@ -1931,6 +2038,7 @@ static irqreturn_t bcmsdhc_irq(int irq, void *dev_id)
 	mmiowb();
 out:
 
+	clk_disable(host->bus_clk);
 	spin_unlock(&host->lock);
 
 	/*

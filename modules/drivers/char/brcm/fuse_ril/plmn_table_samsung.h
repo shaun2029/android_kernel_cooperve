@@ -762,9 +762,9 @@ static const network_info_s_type Plmn_Table_Samsung[] =
 /* Digifone MM02 Ltd */
 { 272,   2, NETWK_TYPE_DCS_1800, "O2.ie", "O2.ie" },  /* Request from MMO2, S8300 20090226 */
 /* Meteor Mobile Telecommunications Limited */
-{ 272,   3, NETWK_TYPE_GSM_900, "Meteor",  "Meteor" },  /* request from Meteor, U800 20080818 */
+{ 272,   3, NETWK_TYPE_GSM_900, "eMobile",  "eMobile" },  /* update EIR 20111010 */
 /* Meteor Mobile Telecommunications Limited */
-{ 272,   3, NETWK_TYPE_DCS_1800, "Meteor",  "Meteor" },  /* request from Meteor, U800 20080818 */
+{ 272,   3, NETWK_TYPE_DCS_1800, "eMobile",  "eMobile" },  /* update EIR 20111010 */
 /* Hutchison NETWK_TYPE_UMTS Ireland limited */
 { 272, 5, NETWK_TYPE_UMTS, "3", "3" }, //2008.12.02 3 IRL->3 최나현사원 요구사항
 
@@ -2723,7 +2723,7 @@ static const network_info_s_type Plmn_Table_Samsung[] =
 /* UMobile Sdn Bhd */
 { 502, 18, NETWK_TYPE_UMTS, "U Mobile", "U Mobile" }, 
 /* Celcom (Malaysia) Sdn Bhd */
-{ 502,  19, NETWK_TYPE_GSM_900, "MY CELCOM", "MY CELCOM" },
+{ 502,  19, NETWK_TYPE_GSM_900, "umobile2G", "umobile2G" }, 
 
 /*******************
  **** Australia ****

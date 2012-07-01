@@ -3871,6 +3871,10 @@ dhd_dev_init_ioctl(struct net_device *dev)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	/* Writing STA's MAC ID to the Dongle for SOFTAP */
+	if(_dhd_set_mac_address(dhd, 0, &dhd->pub.mac)==0)
+		DHD_INFO(("dhd_bus_start: MAC ID is overwritten\n"));
+
 	dhd_preinit_ioctls(&dhd->pub);
 }
 

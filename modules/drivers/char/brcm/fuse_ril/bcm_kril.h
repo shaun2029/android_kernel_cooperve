@@ -142,6 +142,8 @@ typedef struct {
 
 typedef struct {
     char   networkInfo[30];
+    int    manualRat;
+    int    permanentAutoEnable;
 } KrilManualSelectInfo_t;
 
 

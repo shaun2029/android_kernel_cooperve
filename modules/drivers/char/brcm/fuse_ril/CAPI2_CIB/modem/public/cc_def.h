@@ -351,7 +351,7 @@ typedef struct
 {
 	SS_NotifySs_t		notifySs;				///< Notify SS
 	UInt8				facIeBuf[255];			///< Facility IE
-
+    CCallType_t	        callType;			    ///< Call type(SS, Voice, data, video etc)
 }CC_NotifySsInd_t;								///< CC Notify SS Indication Type
 
 

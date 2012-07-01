@@ -47,7 +47,7 @@ Boolean gIsStkRefreshReset = FALSE;
 // For STK
 //UInt8 terminal_profile_data[17] = {0xFF,0xDF,0xFF,0xFF,0x1F,0x80,0x00,0xDF,0xDF,0x00,0x00,
 //                                      0x00,0x00,0x10,0x20,0xA6,0x00};
-UInt8 terminal_profile_data[30] = {0xFF,0xDF,0xFF,0xFF,0xFF,0x81,0x00,0xDF,0xFF,0x00,0x00,
+UInt8 terminal_profile_data[30] = {0xFF,0xFF,0xFF,0xFF,0xFF,0x81,0x00,0xDF,0xFF,0x00,0x00,
                                       0x00,0x00,0x10,0x20,0xA6,0x00,0x00,0x00,0x00, 0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00}; // gearn TP fixed
 
 
@@ -119,7 +119,7 @@ void KRIL_InitCmdHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
                 data.inElemType = MS_LOCAL_PHCTRL_ELEM_IMEI;
                 CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());
                 CAPI2_MsDbApi_SetElement(&clientInfo, &data);
-                pdata->handler_state = BCM_SMS_ELEM_CLIENT_HANDLE_MT_SMS;
+                pdata->handler_state = BCM_SET_HSDPA_PHY_CATEGORY;
                 break;
             }
 #ifdef CONFIG_BRCM_SIM_SECURE_ENABLE 
@@ -135,6 +135,35 @@ void KRIL_InitCmdHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
             // CAPI2_MS_SetElement() call and fall through to execute the
             // next CAPI2 init call instead...
         }
+         
+	case BCM_SET_HSDPA_PHY_CATEGORY:
+		{
+			struct file *filp;
+			mm_segment_t fs;
+			int ret;
+			int hsdpa_phy_cat = 8;
+
+			filp = filp_open("/data/hsdpa.dat",  O_RDWR|O_SYNC, 0);
+			if (IS_ERR(filp))
+			{
+				// Do not set hsdpa phy category value. just go next case. (Normal operaton)
+				pdata->handler_state = BCM_SMS_ELEM_CLIENT_HANDLE_MT_SMS;
+			}
+			else
+			{
+				// hsdpa phy category is changed to do Vodafone test			
+				fs = get_fs();
+				set_fs(get_ds());
+				ret = filp->f_op->read(filp, (char __user *)&hsdpa_phy_cat, sizeof(hsdpa_phy_cat), &filp->f_pos);
+				set_fs(fs);
+				filp_close(filp, NULL);
+
+				KRIL_DEBUG(DBG_ERROR,"BCM_SET_HSDPA_PHY_CATEGORY\n");
+				CAPI2_SYSPARM_SetHSDPAPHYCategory(GetNewTID(), GetClientID(), hsdpa_phy_cat );
+	        	pdata->handler_state = BCM_SMS_ELEM_CLIENT_HANDLE_MT_SMS;
+	        	break;
+			}
+		}
 
         case BCM_SMS_ELEM_CLIENT_HANDLE_MT_SMS:
         {
@@ -275,6 +304,17 @@ void KRIL_InitCmdHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
             memset((UInt8*)&data, 0x00, sizeof(CAPI2_MS_Element_t));
             data.inElemType = MS_LOCAL_SATK_ELEM_SETUP_EVENT_LIST_CTR;
             data.data_u.bData = FALSE;
+            CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());
+            CAPI2_MsDbApi_SetElement(&clientInfo, &data);
+            pdata->handler_state = BCM_CFG_SIM_LOCK_SUPPORTED;
+            break;
+        }
+        case BCM_CFG_SIM_LOCK_SUPPORTED:
+        {
+            CAPI2_MS_Element_t data;
+            memset((UInt8*)&data, 0x00, sizeof(CAPI2_MS_Element_t));
+            data.inElemType = MS_CFG_ELEM_SIM_LOCK_SUPPORTED ;
+            data.data_u.bData = TRUE;
             CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());
             CAPI2_MsDbApi_SetElement(&clientInfo, &data);
             pdata->handler_state = BCM_SS_SET_ENABLE_OLD_SS_MSG;
@@ -458,11 +498,15 @@ void KRIL_RadioPowerHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
             KRIL_DEBUG(DBG_INFO, "On-Off:%d\n", *OnOff);
             if (1 == *OnOff)
             {
-            	  KRIL_DEBUG(DBG_ERROR, "KRIL_RadioPowerHandler: Offline off\n");
-            	  KRIL_DEBUG(DBG_ERROR, "satk_setup_menu_tlv_data_string: %s\n",satk_setup_menu_tlv_data_string);
-            	  KRIL_DEBUG(DBG_ERROR, "satk_setup_menu_tlv_length: %d\n",satk_setup_menu_tlv_length);
-	         if(satk_setup_menu_tlv_length!=0)
+            	if(!gIsFlightModeOnBoot) 	// 2011-08-31 smseol@truemobile.com Running Setup_Menu twice during Boot Sequence on special SIM
+            	{
+            	  	KRIL_DEBUG(DBG_ERROR, "KRIL_RadioPowerHandler: Offline off\n");
+            	  	KRIL_DEBUG(DBG_ERROR, "satk_setup_menu_tlv_data_string: %s\n",satk_setup_menu_tlv_data_string);
+            	  	KRIL_DEBUG(DBG_ERROR, "satk_setup_menu_tlv_length: %d\n",satk_setup_menu_tlv_length);
+	         				
+	         				if(satk_setup_menu_tlv_length!=0)
                 	KRIL_SendNotify(RIL_UNSOL_STK_PROACTIVE_COMMAND, satk_setup_menu_tlv_data_string, (satk_setup_menu_tlv_length * 2 + 1));
+                }			// 2011-08-31 smseol@truemobile.com Running Setup_Menu twice during Boot Sequence on special SIM
             }
 
             break;

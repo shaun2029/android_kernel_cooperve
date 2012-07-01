@@ -76,6 +76,8 @@ the GPL, without Broadcom's express prior written consent.
 #include "csl_apcmd.h"
 
 extern AUDDRV_SPKR_Enum_t voiceCallSpkr;
+extern UInt32 varyExtPGA; /*20111020 for headset analog gain*/
+
 //extern UInt32 lp_voip_start; /* 20110715 for loopback check */
 
 //=============================================================================
@@ -724,7 +726,7 @@ void AUDCTRL_DisablePlay(
 			break;
 		case AUDIO_HW_PLR_OUT:
 			powerOnExternalAmp( spk, PolyUseExtSpkr, FALSE );
-			//OSTASK_Sleep( 10 );
+			OSTASK_Sleep( 10 );
 			AUDDRV_Disable_Output (AUDDRV_RINGTONE_OUTPUT);
 			polySpkr1 = AUDDRV_SPKR_NONE;
 			polySpkr2 = AUDDRV_SPKR_NONE;
@@ -1640,6 +1642,7 @@ void AUDCTRL_SetAudioLoopback(
 		//enable baseband audio path and external audio device (in PMU)
 
 		//PMU audio gain needs correct audio mode.
+#if 0 //CHN version do not need this code
 		if ( speaker == AUDCTRL_SPK_HANDSET )
 			AUDCTRL_SetAudioMode ( AUDIO_MODE_HANDSET, stAudioApp );
 		else
@@ -1648,7 +1651,7 @@ void AUDCTRL_SetAudioLoopback(
 		else
 		if ( speaker == AUDCTRL_SPK_LOUDSPK )
 			AUDCTRL_SetAudioMode ( AUDIO_MODE_SPEAKERPHONE, stAudioApp );
-
+#endif
 		AUDCTRL_EnablePlay(
 				AUDIO_HW_NONE,       //src
 				AUDIO_HW_VOICE_OUT,  //sink
@@ -2059,6 +2062,7 @@ void powerOnExternalAmp( AUDCTRL_SPEAKER_t speaker, ExtSpkrUsage_en_t usage_flag
 
 	static Boolean IHF_IsOn = FALSE;
 	static Boolean HS_IsOn = FALSE;
+	Boolean isEarRing=FALSE;
 
 	Log_DebugPrintf(LOGID_AUDIO,"powerOnExternalAmp, speaker = %d, IHF_IsOn= %d, HS_IsOn = %d, Boolean_Use=%d\n", speaker, IHF_IsOn, HS_IsOn, use);
 
@@ -2173,6 +2177,8 @@ void powerOnExternalAmp( AUDCTRL_SPEAKER_t speaker, ExtSpkrUsage_en_t usage_flag
         	{
 	        	hs_gain = AUDIOMODE_PARM_ACCESSOR(AUDIO_APP_MUSIC,AUDIO_MODE_TTY).ext_speaker_pga;
 	        	Log_DebugPrintf(LOGID_AUDIO,"power ON pmu HS amp, Ringtone case Earphone gain %d\n",hs_gain);
+			isEarRing=TRUE;	
+
         	}
         	
 		Log_DebugPrintf(LOGID_AUDIO,"powerOnExternalAmp (HS on), telephonyUseHS = %d, voiceUseHS= %d, audioUseHS= %d, polyUseHS = %d\n", telephonyUseHS, voiceUseHS, audioUseHS, polyUseHS);
@@ -2180,6 +2186,16 @@ void powerOnExternalAmp( AUDCTRL_SPEAKER_t speaker, ExtSpkrUsage_en_t usage_flag
 #ifdef PMU_BCM59038
 		bcm59038_audio_hs_setGain(hs_path, hs_gain);
 #elif PMU_MAX8986
+
+            /*20111020 for headset analog gain*/
+		if(!isEarRing){
+		    if((mode==AUDIO_MODE_HEADSET)&&(app==AUDIO_APP_MUSIC)){
+				/*HP_VOLUME_NEG_64DB 0,HP_VOLUME_MUTE 32*/
+				if((varyExtPGA>=0)&&(varyExtPGA<=32))hs_gain=varyExtPGA;
+		    	}
+		}
+		isEarRing=FALSE;
+
             max8986_audio_hs_set_gain(hs_path, hs_gain);
             //max8986_set_input_preamp_gain(MAX8986_INPUTA, preamp_gain);
             max8986_set_hs_preamp_gain(preamp_gain);

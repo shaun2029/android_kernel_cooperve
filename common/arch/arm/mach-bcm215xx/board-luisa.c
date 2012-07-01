@@ -252,7 +252,7 @@ static struct bcmsdhc_platform_data bcm21553_sdhc_data3 = {
 	.flags = SDHC_DEVTYPE_SD | SDHC_DISABLE_PED_MODE,
 	.cd_pullup_cfg = SDCD_PULLUP | SDCD_UPDOWN_ENABLE,
 	.irq_cd = 16,
-	.regl_id = "sd_b_vdd",
+	.regl_id = "sd_a_vdd",
 	.syscfg_interface = board_sysconfig,
 	.cfg_card_detect = bcmsdhc_cfg_card_detect,
 	.external_reset = bcmsdhc_external_reset,
@@ -1034,6 +1034,25 @@ static struct regulator_init_data aldo1_init_data = {
 	.consumer_supplies = aldo1_consumers,
 };
 
+static struct regulator_consumer_supply dldo1_consumers[] = {
+	{
+		.dev = NULL,
+		.supply = "sd_a_vdd",
+	},
+};
+
+static struct regulator_init_data dldo1_init_data = {
+	.constraints = {
+		.min_uV = 2500000,
+		.max_uV = 3000000,
+		.valid_ops_mask = REGULATOR_CHANGE_STATUS,
+		.always_on = 0,
+		.boot_on = 0,
+	},
+	.num_consumer_supplies = ARRAY_SIZE(dldo1_consumers),
+	.consumer_supplies = dldo1_consumers,
+};
+
 static struct max8986_regl_init_data bcm21553_regulators[] = {
 	{
 		.regl_id = MAX8986_REGL_SIMLDO,
@@ -1087,6 +1106,11 @@ static struct max8986_regl_init_data bcm21553_regulators[] = {
 		.regl_id = MAX8986_REGL_ALDO1,
 		.dsm_opmode = MAX8986_REGL_OFF_IN_DSM,
 		.init_data = &aldo1_init_data,
+	},
+	{
+		.regl_id = MAX8986_REGL_DLDO1,
+		.dsm_opmode = MAX8986_REGL_LPM_IN_DSM,
+		.init_data = &dldo1_init_data,
 	},
 
 };

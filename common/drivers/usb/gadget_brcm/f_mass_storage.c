@@ -2294,6 +2294,7 @@ static int do_set_config(struct fsg_dev *fsg, u8 new_config)
 		fsg->config = new_config;
 
 	switch_set_state(&fsg->sdev, new_config);
+	pr_info("%s: uevent(%s:%d) sent\n", __func__, fsg->sdev.name, new_config);
 	adjust_wake_lock(fsg);
 	return rc;
 }

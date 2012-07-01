@@ -208,6 +208,11 @@
 #define NORMAL_INT_ENABLE_CARD_REMOVAL   0x0080
 #define NORMAL_INT_ENABLE_CARD_INT       0x0100
 
+//add 
+#define NORMAL_INT_ENABLE_BTACKRXEN       	0x0200
+#define NORMAL_INT_ENABLE_BTIRQ				0x0400
+
+
 /* Error Interrupt status enable register (3.2.20) */
 #define ERR_INT_ENABLE_CMD_TIMEOUT       0x0001
 #define ERR_INT_ENABLE_CMD_CRC           0x0002

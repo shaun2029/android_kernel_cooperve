@@ -49,6 +49,7 @@
 #define BCM_SATK_SEND_SMS_CTR                0x0113
 #define BCM_SATK_SEND_ENABLE_7BIT_CONVERSIONS	0x116
 #define BCM_SATK_SEND_SETUP_EVENT_LIST_CTR	 0x117
+#define BCM_CFG_SIM_LOCK_SUPPORTED		 0x0118
 
 #endif
 
@@ -430,7 +431,9 @@
 #define BCM_GET_SYSTEM_STATE_RSP  	0x100
 #define BCM_SET_SYSTEM_STATE   		  0x101
 #define BCM_SIM_POWER_ON_OFF_CARD   0x102
-
+#define BCM_GET_HSDPA_PHY_CATEGORY 0x103
+#define BCM_GET_HSUPA_PHY_CATEGORY 0x104
+#define BCM_SET_HSDPA_PHY_CATEGORY 0x105
 
 // for Call Control
 void KRIL_GetCurrentCallHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp);

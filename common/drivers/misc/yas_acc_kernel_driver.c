@@ -46,6 +46,9 @@ extern int board_hw_revision;
 #define delay_to_jiffies(d)                                       ((d)?msecs_to_jiffies(d):1)
 #define actual_delay(d)                               (jiffies_to_msecs(delay_to_jiffies(d)))
 
+#define YAS_ACC_DEV_MAJOR 405
+struct class *acc_class;
+
 /* ---------------------------------------------------------------------------------------- *
    Function prototype declaration
  * ---------------------------------------------------------------------------------------- */
@@ -119,6 +122,7 @@ struct yas_acc_private_data {
     int suspend_enable;
 };
 
+static struct yas_acc_data g_accel;
 static struct yas_acc_private_data *yas_acc_private_data = NULL;
 static struct yas_acc_private_data *yas_acc_get_data(void) {return yas_acc_private_data;}
 static void yas_acc_set_data(struct yas_acc_private_data *data) {yas_acc_private_data = data;}
@@ -605,6 +609,14 @@ static ssize_t yas_acc_wake_store(struct device *dev,
     return count;
 }
 
+static ssize_t yas_acc_fs_data_read(struct device *dev,
+                                         struct device_attribute *attr,
+                                         char *buf)
+{
+
+    return sprintf(buf, "%d,%d,%d\n", g_accel.raw.v[0], g_accel.raw.v[1], g_accel.raw.v[2]);
+}
+
 static ssize_t yas_acc_private_data_show(struct device *dev,
                                          struct device_attribute *attr,
                                          char *buf)
@@ -618,6 +630,33 @@ static ssize_t yas_acc_private_data_show(struct device *dev,
     mutex_unlock(&data->data_mutex);
 
     return sprintf(buf, "%d %d %d\n", accel.xyz.v[0], accel.xyz.v[1], accel.xyz.v[2]);
+}
+
+static ssize_t yas_acc_calibration_show(struct device *dev,
+                                  struct device_attribute *attr,
+                                  const char *buf,
+                                  size_t count)
+{
+    int err;
+    unsigned char data_cal[3];
+    struct input_dev *input = to_input_dev(dev);
+    struct yas_acc_private_data *data = input_get_drvdata(input);
+    struct yas_acc_data accel;
+    //unsigned long enable_test = 1;
+    data_cal[0] = data_cal[1] = 0;
+    data_cal[2] = 1;
+    
+    yas_acc_measure(data->driver, &accel);
+    printk("BMA222_CALIBRATION data(%10d %10d %10d) raw(%5d %5d %5d)\n",
+           accel.xyz.v[0], accel.xyz.v[1], accel.xyz.v[2], accel.raw.v[0], accel.raw.v[1], accel.raw.v[2]);
+    err = yas_acc_fast_calibration(data->driver, data_cal);      // calibration start
+    yas_acc_measure(data->driver, &accel);
+    g_accel = accel;
+
+    printk("BMA222_CALIBRATION data(%10d %10d %10d) raw(%5d %5d %5d)\n",
+           accel.xyz.v[0], accel.xyz.v[1], accel.xyz.v[2], accel.raw.v[0], accel.raw.v[1], accel.raw.v[2]);
+	
+    return sprintf(buf, "%d\n", err);	
 }
 
 static ssize_t yas_acc_calibration_store(struct device *dev,
@@ -639,6 +678,8 @@ static ssize_t yas_acc_calibration_store(struct device *dev,
            accel.xyz.v[0], accel.xyz.v[1], accel.xyz.v[2], accel.raw.v[0], accel.raw.v[1], accel.raw.v[2]);
     err = yas_acc_fast_calibration(data->driver, data_cal);      // calibration start
     yas_acc_measure(data->driver, &accel);
+    g_accel = accel;
+
     printk("BMA222_CALIBRATION data(%10d %10d %10d) raw(%5d %5d %5d)\n",
            accel.xyz.v[0], accel.xyz.v[1], accel.xyz.v[2], accel.raw.v[0], accel.raw.v[1], accel.raw.v[2]);
     return count;
@@ -729,6 +770,12 @@ static ssize_t yas_acc_debug_suspend_store(struct device *dev,
 }
 #endif /* DEBUG */
 
+static DEVICE_ATTR(acc_file, 
+                   S_IRUGO, 
+                   yas_acc_fs_data_read, 
+                   NULL 
+                   );
+
 static DEVICE_ATTR(enable,
                    S_IRUGO|S_IWUSR|S_IWGRP,
                    yas_acc_enable_show,
@@ -768,8 +815,8 @@ static DEVICE_ATTR(data,
                    yas_acc_private_data_show,
                    NULL);
 static DEVICE_ATTR(calibration,
-                   S_IWUSR|S_IWGRP,
-                   NULL,
+                   S_IRUGO|S_IWUSR|S_IWGRP,
+                   yas_acc_calibration_show,
                    yas_acc_calibration_store);
                    
 #if DEBUG
@@ -830,9 +877,10 @@ static void yas_acc_work_func(struct work_struct *work)
         input_report_abs(data->input, ABS_RUDDER, cnt++);
     }
     input_sync(data->input);
-
+    
     mutex_lock(&data->data_mutex);
     data->last = accel;
+    g_accel = accel;
     mutex_unlock(&data->data_mutex);
 
     schedule_delayed_work(&data->work, delay);
@@ -970,7 +1018,24 @@ struct i2c_driver yas_acc_driver = {
  * ---------------------------------------------------------------------------------------- */
 static int __init yas_acc_init(void)
 {
+    struct device *dev_t;
     printk("[YAS]Acc Init Complete!\n");
+
+    acc_class = class_create(THIS_MODULE, "accelerometer");
+
+    if (IS_ERR(acc_class)) 
+        return PTR_ERR( acc_class );
+
+    dev_t = device_create( acc_class, NULL, MKDEV(YAS_ACC_DEV_MAJOR, 0), "%s", "accelerometer");
+
+    if (device_create_file(dev_t, &dev_attr_acc_file) < 0)
+        printk(KERN_ERR "Failed to create device file(%s)!\n", dev_attr_acc_file.attr.name);
+
+    if (IS_ERR(dev_t)) 
+    {
+        return PTR_ERR(dev_t);
+    }
+
     return i2c_add_driver(&yas_acc_driver);
 }
 module_init(yas_acc_init);

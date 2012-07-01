@@ -77,6 +77,8 @@ static struct miscdevice ecs_ctrl_device = {
 	.fops = &ecs_ctrl_fops,
 };
 
+extern int proximity_get_int_value(void);
+
 #if defined(CONFIG_SENSORS_TAOS)          
 extern short taos_get_proximity_value(void);
 #else
@@ -196,6 +198,13 @@ static int ecs_ctrl_ioctl(struct inode *inode, struct file *file,
 		if (flag < 0 || flag > 1)
 			return -EINVAL;
 		atomic_set(&p_flag, flag);
+
+                if(flag==1)
+                {
+                    input_report_abs(ecs_data_device, ABS_DISTANCE, ((proximity_get_int_value() == 0)? 0:1));
+                    input_sync(ecs_data_device);                    
+                }
+        
 		break;
 	case ECOMPASS_IOC_GET_PFLAG:
 		MECSDBG("[MECS] ECOMPASS_IOC_GET_PFLAG\n");               
@@ -397,7 +406,7 @@ static int __init ecompass_init(void)
 		0, 100, 0, 0);
 	/* proximity sensor */	
 	input_set_abs_params(ecs_data_device, ABS_DISTANCE,
-		-3, 3, 0, 0);
+		0, 1, 0, 0);
 
 	ecs_data_device->name = ECS_DATA_DEV_NAME;
 	res = input_register_device(ecs_data_device);
@@ -417,6 +426,10 @@ static int __init ecompass_init(void)
 		pr_err("%s: device_create_file failed\n", __FUNCTION__);
 		goto out_deregister_misc;
 	}
+
+	/* set initial proximity value as 1 */
+	input_report_abs(ecs_data_device, ABS_DISTANCE, 1);
+	input_sync(ecs_data_device);
 
 	printk(KERN_INFO "[MECS] ecompass driver: end\n");
 	return 0;

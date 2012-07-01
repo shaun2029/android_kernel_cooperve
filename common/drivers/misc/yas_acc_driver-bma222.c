@@ -197,11 +197,11 @@ static struct yas_bma222_data acc_data;
 
 /* Output data rate */
 static const struct yas_bma222_odr yas_bma222_odr_tbl[] = {
-    {1,   YAS_BMA222_BANDWIDTH_250HZ},
-    {2,   YAS_BMA222_BANDWIDTH_125HZ},
-    {4,   YAS_BMA222_BANDWIDTH_63HZ},
-    {8,   YAS_BMA222_BANDWIDTH_32HZ},
-    {16,  YAS_BMA222_BANDWIDTH_16HZ},
+    {1,   YAS_BMA222_BANDWIDTH_125HZ},
+    {2,   YAS_BMA222_BANDWIDTH_63HZ},
+    {4,   YAS_BMA222_BANDWIDTH_32HZ},
+    {8,   YAS_BMA222_BANDWIDTH_16HZ},
+    {16,  YAS_BMA222_BANDWIDTH_8HZ},
     {32,  YAS_BMA222_BANDWIDTH_8HZ},
     {64,  YAS_BMA222_BANDWIDTH_8HZ},
     {128, YAS_BMA222_BANDWIDTH_8HZ},

@@ -48,7 +48,11 @@
 #endif /*CONFIG_HAS_WAKELOCK*/
 
 #define REF_TIME 300000000
+#if defined(CONFIG_TARGET_LOCALE_AUS_TEL)
+#define KEY_BEFORE_PRESS_REF_TIME msecs_to_jiffies(80)
+#else
 #define KEY_BEFORE_PRESS_REF_TIME msecs_to_jiffies(50)
+#endif
 #define KEY_PRESS_REF_TIME msecs_to_jiffies(5)
 #define TYPE_DETECT_REF_TIME msecs_to_jiffies(100)
 #define GET_IMSI_REF_TIME msecs_to_jiffies(8000)
@@ -71,8 +75,8 @@
 #define HEADSET_3_POLE 	2
 #define PRESS 1
 #define RELEASE 0
-#define ENABLE 0
-#define DISABLE 1
+#define ENABLE 1
+#define DISABLE 0
 #define WAKE_LOCK_TIME		(HZ * 5)	/* 5 sec */
 
 static const int hs_keycodes[] = {
@@ -96,6 +100,7 @@ static int key_resolved = 0;
 static int key_type = 0;
 static int FactoryMode = DISABLE;
 
+extern int sync_use_mic;
 extern void set_button(int value);
 extern int auxadc_access(int);
 extern int bcm_gpio_set_db_val(unsigned int gpio, unsigned int db_val);
@@ -293,7 +298,10 @@ static void input_work_func(struct work_struct *work)
 		key_count[0] = key_count[1] = key_count[2] = 0;
 
 		if(FactoryMode == DISABLE)
+		{
 			board_sysconfig(SYSCFG_AUXMIC, SYSCFG_ENABLE | SYSCFG_DISABLE);
+		sync_use_mic = DISABLE;
+		}
 
 #ifdef REG_DEBUG
 		val_anacr2 = readl(io_p2v(REG_ANACR2));
@@ -336,6 +344,7 @@ static void switch_work(struct work_struct *work)
 				board_sysconfig(SYSCFG_HEADSET, SYSCFG_DISABLE);
 
 			mic.hsbst = DISABLE;
+			sync_use_mic = DISABLE;
 			switch_set_state(&(mic.switch_data.sdev), mic.headset_state);
 
 			printk("%s: plugged out\n", __func__);
@@ -371,6 +380,9 @@ static void type_work_func(struct work_struct *work)
 	}
 
 	switch_set_state(&(mic.switch_data.sdev), mic.headset_state);
+
+	if(FactoryMode == DISABLE)
+	sync_use_mic = DISABLE;
 
 #ifdef REG_DEBUG
 	val_anacr2 = readl(io_p2v(REG_ANACR2));
@@ -465,6 +477,7 @@ irqreturn_t hs_isr(int irq, void *dev_id)
 
 	if (p->headset_pd->check_hs_state)
 	{
+		sync_use_mic = ENABLE;
 		p->hsirq_triggerred = 1 ;
 		p->headset_pd->check_hs_state(&attached_state);
 		set_irq_type(mic.hsirq, (attached_state) ? IRQF_TRIGGER_RISING : IRQF_TRIGGER_FALLING);
@@ -482,6 +495,7 @@ irqreturn_t hs_isr(int irq, void *dev_id)
 
 		p->headset_state = (p->headset_state) ? 0 : 1;
 		set_irq_type(mic.hsirq, (p->headset_state) ? IRQF_TRIGGER_FALLING : IRQF_TRIGGER_RISING);
+		sync_use_mic = ENABLE;
 		schedule_work(&(p->switch_data.work));
 	}
 
@@ -539,6 +553,7 @@ irqreturn_t hs_buttonisr(int irq, void *dev_id)
 		key_resolved = 0;
 		key_count[0] = key_count[1] = key_count[2] = 0;
 
+		sync_use_mic = ENABLE;
 		schedule_delayed_work(&(mic.input_work), KEY_BEFORE_PRESS_REF_TIME);
 		printk("%s: set_button => PRESS\n", __func__);
 		set_button(PRESS); 
@@ -702,6 +717,7 @@ static int __init hs_probe(struct platform_device *pdev)
 	else if(result > 0 && (mic.hsmajor == 0))    /* this is for dynamic major */
 		mic.hsmajor = result;
 
+	wake_lock_init(&mic.det_wake_lock, WAKE_LOCK_SUSPEND, "sec_jack_det");
 	INIT_DELAYED_WORK(&(mic.imsi_work), getIMSI_work_func);
 
 	/* check if platform data is defined for a particular board variant */
@@ -771,7 +787,6 @@ static int __init hs_probe(struct platform_device *pdev)
 		schedule_work(&(mic.switch_data.work));
 		schedule_delayed_work(&(mic.imsi_work), GET_IMSI_REF_TIME);
 	}
-	wake_lock_init(&mic.det_wake_lock, WAKE_LOCK_SUSPEND, "sec_jack_det");
 
 	return 0;
 

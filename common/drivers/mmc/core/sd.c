@@ -349,7 +349,11 @@ static int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
 	 * state.  We wait 1ms to give cards time to
 	 * respond.
 	 */
-	mmc_go_idle(host);
+	printk("%s : Card go to idle state\n",__func__);
+	err = mmc_go_idle(host);
+	
+	if(err)
+		printk("%s:fail to send CMD0 to go idle\n",__func__);
 
 	/*
 	 * If SD_SEND_IF_COND indicates an SD 2.0
@@ -361,10 +365,13 @@ static int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
 	if (!err)
 		ocr |= 1 << 30;
 
+	printk("%s : send ACMD41\n",__func__);
 	err = mmc_send_app_op_cond(host, ocr, NULL);
 	if (err)
+	{
+		printk("%s : fail to send ACMD41\n",__func__);
 		goto err;
-
+	}
 	/*
 	 * Fetch CID from card.
 	 */
@@ -373,11 +380,15 @@ static int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
 	else
 		err = mmc_all_send_cid(host, cid);
 	if (err)
+	{
+		printk("%s : fail to send CMD2\n",__func__);
 		goto err;
+	}
 
 	if (oldcard) {
 		if (memcmp(cid, oldcard->raw_cid, sizeof(cid)) != 0) {
 			err = -ENOENT;
+			printk("%s : fail to memcpy\n",__func__);
 			goto err;
 		}
 

@@ -1257,6 +1257,7 @@ composite_switch_work(struct work_struct *data)
 		}
 #endif
                switch_set_state(&cdev->sw_connected, connected);
+               pr_info("%s: uevent(%s:%d) sent\n", __func__, cdev->sw_connected.name, connected);
        } else {
                spin_unlock_irqrestore(&cdev->lock, flags);
        }
@@ -1265,6 +1266,7 @@ composite_switch_work(struct work_struct *data)
 		switch_set_state(&cdev->sw_config, config->bConfigurationValue);
 	else
 		switch_set_state(&cdev->sw_config, 0);
+		pr_info("%s: uevent(%s:%d) sent\n", __func__, cdev->sw_config.name, config?config->bConfigurationValue:0);
 }
 
 static int composite_bind(struct usb_gadget *gadget)

@@ -1,0 +1,25 @@
+decompress.o: arch/arm/boot/compressed/decompress.c \
+ include/generated/autoconf.h include/linux/compiler.h \
+ include/linux/compiler-gcc.h include/linux/compiler-gcc4.h \
+ include/linux/types.h \
+ /home/rafael/Kernel_GT-S5830C/common/arch/arm/include/asm/types.h \
+ include/asm-generic/int-ll64.h \
+ /home/rafael/Kernel_GT-S5830C/common/arch/arm/include/asm/bitsperlong.h \
+ include/asm-generic/bitsperlong.h include/linux/posix_types.h \
+ include/linux/stddef.h \
+ /home/rafael/Kernel_GT-S5830C/common/arch/arm/include/asm/posix_types.h \
+ include/linux/linkage.h \
+ /home/rafael/Kernel_GT-S5830C/common/arch/arm/include/asm/linkage.h \
+ /home/rafael/Kernel_GT-S5830C/common/arch/arm/include/asm/string.h \
+ arch/arm/boot/compressed/../../../../lib/decompress_inflate.c \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inftrees.c \
+ include/linux/zutil.h include/linux/zlib.h include/linux/zconf.h \
+ include/linux/string.h include/linux/kernel.h \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inftrees.h \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inffast.c \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inflate.h \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inffast.h \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inflate.c \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/infutil.h \
+ arch/arm/boot/compressed/../../../../lib/zlib_inflate/inffixed.h \
+ include/linux/decompress/mm.h

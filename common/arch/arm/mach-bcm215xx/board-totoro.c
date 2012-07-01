@@ -173,7 +173,11 @@
 extern int pmu_is_charger_inserted();
 #define KEY_PRESS_THRESHOLD	0x6d00
 #define KEY_3POLE_THRESHOLD	670	// ~ 55 and 57 ~, measured on Totoro
+#if defined(CONFIG_TARGET_LOCALE_AUS_TEL)
+#define KEY1_THRESHOLD_L	20	// 9 to 83, mesaured on Luisa
+#else
 #define KEY1_THRESHOLD_L	0	// 9 to 83, mesaured on Luisa
+#endif
 #define KEY1_THRESHOLD_U	104
 #define KEY2_THRESHOLD_L	104	// 117 to 183, mesaured on Luisa
 #define KEY2_THRESHOLD_U	220
@@ -2463,13 +2467,23 @@ int board_sysconfig(uint32_t module, uint32_t op)
 			writel(readl(ADDR_SYSCFG_IOCR2)
 			       | SYSCFG_IOCR2_SD3DAT_PULL_CTRL(SD_PULL_UP),
 			       ADDR_SYSCFG_IOCR2);
-			
+
+#if defined(CONFIG_TARGET_LOCALE_AUS_TEL)				
+			//Set SDIO3 Driving Strength			
+			printk("[CONFIG_TARGET_LOCALE_AUS_TEL] SDIO3 DS is set to 12mA\n");
+			val = readl(ADDR_SYSCFG_IOCR4);
+			val &=~(SYSCFG_IOCR4_SD3_DAT_DRV_STGTH(0x7));
+			val &=~(SYSCFG_IOCR4_SD3_CLK_DRV_STGTH(0x7));
+			val |=(SYSCFG_IOCR4_SD3_DAT_DRV_STGTH(0x7)+SYSCFG_IOCR4_SD3_CLK_DRV_STGTH(0x7));
+#else
 			//Set SDIO3 Driving Strength			
 			printk("SDIO3 DS is set to 6mA\n");
 			val = readl(ADDR_SYSCFG_IOCR4);
 			val &=~(SYSCFG_IOCR4_SD3_DAT_DRV_STGTH(0x7));
 			val &=~(SYSCFG_IOCR4_SD3_CLK_DRV_STGTH(0x7));
 			val |=(SYSCFG_IOCR4_SD3_DAT_DRV_STGTH(0x4)+SYSCFG_IOCR4_SD3_CLK_DRV_STGTH(0x4));
+#endif
+
 			writel(val, ADDR_SYSCFG_IOCR4); 
 
 		} else if (op == SYSCFG_DISABLE) {

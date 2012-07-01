@@ -21,6 +21,7 @@ Broadcom's express prior written consent.
 // Include directives
 //=============================================================================
 
+#include <linux/module.h>
 #include "mobcom_types.h"
 #include "audio_consts.h"
 #include "auddrv_def.h"
@@ -50,7 +51,7 @@ Broadcom's express prior written consent.
 
 #include "assert.h"
 #include "gpio_drv.h"
-
+#include "csl_apcmd.h"
 
 #ifdef UNDER_LINUX
 #include <asm/io.h>
@@ -136,8 +137,8 @@ static Boolean btwb_en_for_datadriver = FALSE;
 //digital HW status
 static Boolean aopath_enabled = FALSE;
 static Boolean popath_enabled = FALSE;
-static Boolean vopath_enabled = FALSE;
-static Boolean vipath_enabled = FALSE;
+/*static*/ Boolean vopath_enabled = FALSE;
+/*static*/ Boolean vipath_enabled = FALSE;
 static Boolean aipath_enabled = FALSE;
 static Boolean btwb_enabled = FALSE;
 static Boolean btnb_enabled = FALSE;
@@ -191,7 +192,8 @@ static CB_SetAudioMode_t  client_SetAudioMode = NULL;
 static CB_SetMusicMode_t  client_SetMusicMode = NULL;
 
 static CB_GetAudioApp_t  client_GetAudioApp = NULL;
-
+int sync_use_mic = FALSE;
+EXPORT_SYMBOL(sync_use_mic);
 //=============================================================================
 // Private function prototypes
 //=============================================================================
@@ -332,9 +334,11 @@ IOCR0.DIGMIC_MUX:  DIGMIC/GPIO[63:62] Select
 */
 		//brcm_rdb_syscfg.h does not match ASIC RDB
 		//*(volatile UInt32 *)0x08880000 &= ~(0x01000000); //clear bit 24 for Select DIGMIC_MUX
-        Log_DebugPrintf(LOGID_AUDIO, "\n\r\t* AUDDRV_SPKRInit: Select DIGMIC_MUX*\n\r" );#if 0 //Luisa's KEY_LED_EN => DIGMICCLK(GPIO62)
+        Log_DebugPrintf(LOGID_AUDIO, "\n\r\t* AUDDRV_SPKRInit: Select DIGMIC_MUX*\n\r" );
+#if 0 //Luisa's KEY_LED_EN => DIGMICCLK(GPIO62)
         *(volatile UInt32 *)SYSCFG_BASE_ADDR &= ~(0x01000000); //clear bit 24 for Select DIGMIC_MUX
-        SYSCFGDRV_Config_Pin_Mux(   SYSCFG_DIGMIC_GPIO_MUX_DIGMIC_SEL   );#endif
+        SYSCFGDRV_Config_Pin_Mux(   SYSCFG_DIGMIC_GPIO_MUX_DIGMIC_SEL   );
+#endif
 
 		for(i=0; i<AUDDRV_MIC_TOTAL_NUM; i++)
 		{
@@ -1175,7 +1179,8 @@ void AUDDRV_DisableHWInput (
 			//voice_mic_current = AUDDRV_MIC_NONE;
 			//need to fix this because if we check here, VO is on during voice call
 			// so siabel VI path will not be called
-			if (AUDDRV_GetVCflag() == FALSE) //( vopath_enabled == FALSE )
+			// if (AUDDRV_GetVCflag() == FALSE) //( vopath_enabled == FALSE )
+			if (AUDDRV_GetVCflag() == FALSE && vopath_enabled == FALSE)
 			{
 				Log_DebugPrintf(LOGID_AUDIO, "\n\r\t* AUDDRV_DisableHWInput disable AMCR *\n\r" );
 				//rule #2
@@ -1394,6 +1399,7 @@ void AUDDRV_SelectSpkr (
 		case AUDDRV_SPKR_USB_IF:
 			//turn on AMCR PCM interface
 			chal_audiopcmif_Enable(pcmif_handle, TRUE);
+			VPRIPCMDQ_DigitalSound(TRUE);
 			auddrv_pwrOffUnusedSpkr( ); // turn off analog speaker will also check D2C off inside
 			break;
 
@@ -2267,6 +2273,7 @@ static void auddrv_selectSpkrDrvMode( AUDDRV_SPKR_Enum_t speaker )
 		case AUDDRV_SPKR_PCM_IF:
 			//turn on PCM interface
 			chal_audiopcmif_Enable(pcmif_handle, TRUE);
+			VPRIPCMDQ_DigitalSound(TRUE);
 			break;
 
 		case AUDDRV_SPKR_HS_LEFT:
@@ -2340,7 +2347,7 @@ static void auddrv_config_spkrChMode(
 		case AUDDRV_SPKR_PCM_IF:
 			//turn on PCM interface
 			chal_audiopcmif_Enable(pcmif_handle, TRUE);
-
+			VPRIPCMDQ_DigitalSound(TRUE);
 			break;
 
 		case AUDDRV_SPKR_HS_LEFT:
@@ -2368,7 +2375,8 @@ static Boolean auddrv_spkrIsUsed( AUDDRV_SPKR_Enum_t  spkr )
 		return FALSE;
 }
 
-// ramping time is set to 0#define ANALOG_RAMP_UP   0x0080
+// ramping time is set to 0
+#define ANALOG_RAMP_UP   0x0080
 #define ANALOG_RAMP_DOWN 0x0000
 
 #define ANALOG_HS_RAMP_UP   0x0081
@@ -2463,6 +2471,12 @@ static void auddrv_pwrOffUnusedSpkr( void )
 		}
 	}
 
+	if ( (voice_mic_current != AUDDRV_MIC_PCM_IF) && (voiceSpkr1 != AUDDRV_SPKR_PCM_IF) && (voiceSpkr2 != AUDDRV_SPKR_PCM_IF) )
+	{
+		chal_audiopcmif_Enable(pcmif_handle, FALSE);
+		VPRIPCMDQ_DigitalSound(FALSE);
+	}
+
 	//d2c at last.
 	auddrv_pwrdn_d2c( TRUE );
 }
@@ -2506,7 +2520,6 @@ static void auddrv_powerOnSpkr(	void )
 		}
 	}
 
-
 	if ( auddrv_spkrIsUsed( AUDDRV_SPKR_HS ) )
 	{
 		Log_DebugPrintf(LOGID_AUDIO, "\n\r\t* auddrv_spkr_driver_power - mixer34 - headsetON  *\n\r");
@@ -2534,6 +2547,12 @@ static void auddrv_powerOnSpkr(	void )
 			//OSTASK_Sleep(150);
 		}
 	}
+
+	if (voiceSpkr1==AUDDRV_SPKR_PCM_IF || voiceSpkr2==AUDDRV_SPKR_PCM_IF )
+	{
+		chal_audiopcmif_Enable(pcmif_handle, TRUE);
+		VPRIPCMDQ_DigitalSound(TRUE);
+	}
 }
 
 // Description:   DMIC power to mux with GPIO
@@ -2548,7 +2567,8 @@ IOCR0.DIGMIC_MUX:  DIGMIC/GPIO[63:62] Select
 	//*(volatile UInt32 *)0x08880000 &= ~(0x01000000); //clear bit 24 for Select DIGMIC_MUX
     SYSCFGDRV_Config_Pin_Mux(   SYSCFG_DIGMIC_GPIO_MUX_DIGMIC_SEL   );
 #if 0 //Luisa's KEY_LED_EN => DIGMICCLK(GPIO62)
-    *(volatile UInt32 *)SYSCFG_BASE_ADDR &= ~(0x01000000);#endif
+    *(volatile UInt32 *)SYSCFG_BASE_ADDR &= ~(0x01000000);
+#endif
 
 	if(on)
 	{
@@ -2668,7 +2688,7 @@ static void auddrv_pwrOnMic(
 	    case AUDDRV_MIC_PCM_IF:  
 		    //need AMCR PCM on
 			chal_audiopcmif_Enable(pcmif_handle, TRUE);
-
+			VPRIPCMDQ_DigitalSound(TRUE);
 		    break;
   
 	    case AUDDRV_MIC_DIGI1:
@@ -2734,7 +2754,8 @@ static void auddrv_pwrOffUnusedMic( void )
 	//aux mic  (aux mic can not be part of dual-mic with digi mic)
 	if ( auddrv_mic_not_used( AUDDRV_MIC_ANALOG_AUX ) && micPoweredOn[AUDDRV_MIC_ANALOG_AUX]== TRUE )
 	{
-		if( auddrv_analog_mic_not_used() )
+		if( auddrv_analog_mic_not_used() && (!sync_use_mic))
+
 		{
 			//rule #4
 			chal_audiomic_PowerOnADC( mic_handle, AUXMIC_BIAS_LPMODE );
@@ -2745,10 +2766,11 @@ static void auddrv_pwrOffUnusedMic( void )
 		}
 	}
 
-	//case AUDDRV_MIC_PCM_IF: 
-	// always turn off AMCR PCM interface ??
+	if ( (voice_mic_current != AUDDRV_MIC_PCM_IF) && (voiceSpkr1 != AUDDRV_SPKR_PCM_IF) && (voiceSpkr2 != AUDDRV_SPKR_PCM_IF) )
+	{
 	chal_audiopcmif_Enable(pcmif_handle, FALSE);
-	// need to consider if under BT call and recording off case
+		VPRIPCMDQ_DigitalSound(FALSE);
+	}
 
 	//digi mic
 	if ( (auddrv_mic_not_used( AUDDRV_MIC_DIGI1 ) && micPoweredOn[AUDDRV_MIC_DIGI1]== TRUE)
@@ -2839,6 +2861,7 @@ static void auddrv_select_mic_input(
 				case AUDDRV_MIC_PCM_IF: //done in vdriver
 					// trun on AMCR PCM interface
 					chal_audiopcmif_Enable(pcmif_handle, TRUE);
+					VPRIPCMDQ_DigitalSound(TRUE);
 					break;
 
 				default:

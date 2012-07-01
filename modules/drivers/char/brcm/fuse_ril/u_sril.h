@@ -98,6 +98,12 @@
 #define OEM_START_RIL_LOG					0x0C
 #define OEM_DEL_RIL_LOG						0x0D
 
+#define OEM_TCPDUMP_START				0x15
+
+#define OEM_TCPDUMP_STOP					0x16
+
+
+
 //SOUND
 #define OEM_SOUND_SET_MINUTE_ALERT			0x01
 #define OEM_SOUND_GET_MINUTE_ALERT			0x02

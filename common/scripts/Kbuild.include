@@ -207,12 +207,24 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
 	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
 
 # Execute the command and also postprocess generated .d dependencies file.
+ifneq ($(IDE_PROJECT_GENERATOR),true)
 if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
 	@set -e;                                                             \
 	$(echo-cmd) $(cmd_$(1));                                             \
 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
 	rm -f $(depfile);                                                    \
 	mv -f $(dot-target).tmp $(dot-target).cmd)
+else
+## IDE Project Generator
+# Generate dependency files for all built files
+if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                     \
+	@set -e;                                                                    \
+	$(echo-cmd) $(cmd_$(1));                                                    \
+	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;       \
+	cp -f $(depfile) $(depfile)_;                                               \
+	rm -f $(depfile);                                                           \
+	mv -f $(dot-target).tmp $(dot-target).cmd)
+endif
 
 # Usage: $(call if_changed_rule,foo)
 # Will check if $(cmd_foo) or any of the prerequisites changed,

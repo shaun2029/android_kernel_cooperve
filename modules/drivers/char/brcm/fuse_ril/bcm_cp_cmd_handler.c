@@ -619,7 +619,7 @@ void CAPI2_SIMLOCK_GetStatus(UInt32 tid, UInt8 clientID, SIMLOCK_SIM_DATA_t *sim
 {
     SIMLOCK_STATE_t simlock_state;
 
-	char msg[IMSI_DIGITS + 1 + 5];	///< NULL terminated IMSI string in ASCII format
+	char msg[5 + IMSI_DIGITS + 1 + 1 + GID_DIGITS + 1 + GID_DIGITS]  ;	///< NULL terminated IMSI string in ASCII format
 	
     KRIL_DEBUG(DBG_INFO,"Get SIM lock status\n");
     SetSIMData(sim_data);
@@ -649,7 +649,20 @@ void CAPI2_SIMLOCK_GetStatus(UInt32 tid, UInt8 clientID, SIMLOCK_SIM_DATA_t *sim
 	msg[2]=(UInt8)'C';
 	msg[3]=(UInt8)'M';
 	msg[4]=(UInt8)BRIL_HOOK_UNSOL_SIM_DATA;
-    strncpy(&msg[5],(char*)sim_data->imsi_string,(IMSI_DIGITS+1));
+	
+    strncpy(&msg[5],(char*)sim_data->imsi_string,(IMSI_DIGITS+1)); //IMSI
+	
+	msg[5 + IMSI_DIGITS +1] = sim_data->gid1_len;
+
+
+	
+	if(sim_data->gid1_len > 0)
+		memcpy(&msg[5 + IMSI_DIGITS + 1 + 1],sim_data->gid1,GID_DIGITS); //GID1
+
+	msg[5 + IMSI_DIGITS + 1 + 1 + GID_DIGITS] = sim_data->gid2_len;
+	if(sim_data->gid2_len > 0)
+		memcpy(&msg[5 + IMSI_DIGITS + 1 + 1 + GID_DIGITS + 1],sim_data->gid2,GID_DIGITS); //GID2
+
 	KRIL_SendNotify(RIL_UNSOL_OEM_HOOK_RAW, msg, sizeof(msg));
 
 

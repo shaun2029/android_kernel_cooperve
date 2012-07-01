@@ -56,6 +56,24 @@ static struct miscdevice gp2a_prox_misc_device = {
 extern int bcm_gpio_pull_up(unsigned int gpio, bool up);
 extern int bcm_gpio_pull_up_down_enable(unsigned int gpio, bool enable);
 
+#if defined(CONFIG_SENSORS_LUISA)
+void prox_ctrl_regulator_forced(void)
+{
+	prox_regulator = regulator_get(NULL,"prox_vcc");
+       
+	if(!regulator_is_enabled(prox_regulator))
+	{
+		regulator_set_voltage(prox_regulator,2900000,2900000);
+		regulator_enable(prox_regulator);
+                printk(KERN_INFO "[GP2A] : prox_ctrl_regulator_forced \n");                          
+                prox_power_mode = true;        
+        /*After Power Supply is supplied, about 1ms delay is required before issuing read/write commands */
+                mdelay(2);            
+	}
+}
+EXPORT_SYMBOL(prox_ctrl_regulator_forced);
+#endif
+
 static void prox_ctrl_regulator(int on_off)
 {
 	if(on_off)
@@ -354,17 +372,25 @@ static int gp2a_prox_mode(int enable)
  * get_gp2a_proximity_value() is called by magnetic sensor driver(ak8973)
  * for reading proximity value.
  */
+
+int proximity_get_int_value(void)
+{
+        int int_value;
+        
+        PROXDBG("[GP2A] proximity_get_int_value GPIO_PS_OUT : %d\n", gpio_get_value(GPIO_PS_OUT));     
+        
+        if(gpio_get_value(GPIO_PS_OUT))
+                int_value =1;
+        else
+                int_value =0;                
+        
+        return int_value;
+        }
+EXPORT_SYMBOL(proximity_get_int_value);
+        
+
 int gp2a_get_proximity_value(void)
 {
-        if(prox_value_cnt ==1)
-        {
-            	PROXDBG("[GP2A] gp2a_get_proximity_value_forced : 0\n"); 
-                prox_value_cnt++;  
-        	return 1;   //proximity_value =0;
-        }
-        
-        if(prox_value_cnt < 3) prox_value_cnt++;        
-
 	PROXDBG("[GP2A] gp2a_get_proximity_value called : %d\n",proximity_value); 
 
 	return ((proximity_value == 1)? 0:1);

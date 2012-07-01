@@ -1,5 +1,4 @@
 /*******************************************************************************************
-
 Copyright 2010 Broadcom Corporation.  All rights reserved.
 
 Unless you and Broadcom execute a separate written software license agreement
@@ -10,7 +9,6 @@ http://www.gnu.org/copyleft/gpl.html (the "GPL").
 Notwithstanding the above, under no circumstances may you combine this software
 in any way with any other Broadcom software provided under a license other than
 the GPL, without Broadcom's express prior written consent.
-
 *******************************************************************************************/
 /**
 *

@@ -579,12 +579,11 @@ void KRIL_RegistationStateHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
                 }
                 else if (presult->rat == RAT_UMTS)
                 {
-                    if (SUPPORTED == gRegInfo.netInfo.hsdpa_supported ||
-                        TRUE == gUE3GInfo.in_uas_conn_info.hsdpa_ch_allocated)
+                    if (TRUE == presult->uasConnInfo.hsdpa_ch_allocated)
                     {
                         rdata->network_type = 9; //HSDPA
                     }
-                    else if (SUPPORTED == gRegInfo.netInfo.hsupa_supported)
+                    else if (TRUE == presult->uasConnInfo.hsupa_ch_allocated)
                     {
                         rdata->network_type = 10; //HSUPA
                     }
@@ -625,7 +624,8 @@ void KRIL_RegistationStateHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
                 KRIL_DEBUG(DBG_INFO, "regstate:%d gprs_reg_state:%d mcc:ox%x mnc:0x%x rat:%d lac:%d cell_id:%d network_type:%d band:%d\n", rdata->gsm_reg_state, rdata->gprs_reg_state, rdata->mcc, rdata->mnc, presult->rat, rdata->lac, rdata->cell_id, rdata->network_type, rdata->band);
                 if (presult->rat == RAT_UMTS)
                 {
-                    if (TRUE == presult->uasConnInfo.ue_out_of_service) // if UAS in out of services, MMI need to display the no_services.
+                    if ((TRUE == presult->uasConnInfo.ue_out_of_service) &&
+                        (TRUE == gRegInfo.netInfo.hsdpa_supported || TRUE == gRegInfo.netInfo.hsupa_supported)) // if UAS in out of services and in hsdpa/hsupa support, MMI need to display the no_services.
                     {
                         rdata->gsm_reg_state = REG_STATE_NO_SERVICE;
                         rdata->gprs_reg_state = REG_STATE_NO_SERVICE;
@@ -732,10 +732,10 @@ void KRIL_OperatorHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
                     pdata->handler_state = BCM_ErrorCAPI2Cmd;
                     break;
                 }
-		  if ((presult->gsm_reg_state != REG_STATE_NORMAL_SERVICE 
-                 && presult->gsm_reg_state != REG_STATE_ROAMING_SERVICE
-                 && presult->gsm_reg_state != REG_STATE_LIMITED_SERVICE)
-                    || TRUE == presult->uasConnInfo.ue_out_of_service)
+                if ((presult->gsm_reg_state != REG_STATE_NORMAL_SERVICE &&
+                     presult->gsm_reg_state != REG_STATE_ROAMING_SERVICE &&
+                     presult->gsm_reg_state != REG_STATE_LIMITED_SERVICE) ||
+                    (TRUE == presult->uasConnInfo.ue_out_of_service && (TRUE == gRegInfo.netInfo.hsdpa_supported || TRUE == gRegInfo.netInfo.hsupa_supported)))
                 {
                     pdata->result = RIL_E_OP_NOT_ALLOWED_BEFORE_REG_TO_NW;
                     pdata->handler_state = BCM_ErrorCAPI2Cmd;
@@ -961,7 +961,14 @@ void KRIL_SetNetworkSelectionAutomaticHandler(void *ril_cmd, Kril_CAPI2Info_t *c
                     KRIL_SetInNetworkSelectHandler( FALSE );
                     pdata->handler_state = BCM_FinishCAPI2Cmd;
                 }
-                else
+		    	else if(NO_NETWORK_SERVICE== presult) //[2011.11.03][dw47.kim]add NO_NETWORK_SERVICE
+		    	{
+ 	 	        	KRIL_DEBUG(DBG_INFO, "NO_NETWORK_SERVICE, presult: %d", presult);
+		        	pdata->result = RIL_E_GENERIC_FAILURE;
+		        	KRIL_SetInNetworkSelectHandler(FALSE);
+                	pdata->handler_state = BCM_ErrorCAPI2Cmd;
+		    	}
+                else 
                 {
                     KRIL_DEBUG(DBG_ERROR, "error, calling CAPI2_NetRegApi_AbortPlmnSelect...\n", presult);
                     CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());
@@ -1007,17 +1014,43 @@ void KRIL_SetNetworkSelectionManualHandler(void *ril_cmd, Kril_CAPI2Info_t *capi
 
     switch(pdata->handler_state)
     {
-        case BCM_SendCAPI2Cmd:
-        {
-            KrilManualSelectInfo_t *tdata = (KrilManualSelectInfo_t *)pdata->ril_cmd->data;
-            // we're not re-entrant, so indicate to command thread that we're already handling 
-            // a network select request 
-            KRIL_SetInNetworkSelectHandler( TRUE );
-            KRIL_DEBUG(DBG_INFO, "network_info:%s\n", tdata->networkInfo);
-            KRIL_SetNetworkSelectTID( GetNewTID() );
-            CAPI2_InitClientInfo(&clientInfo, KRIL_GetNetworkSelectTID(), GetClientID());
-            CAPI2_NetRegApi_PlmnSelect(&clientInfo, FALSE, PLMN_SELECT_MANUAL, PLMN_FORMAT_NUMERIC, (char *)tdata->networkInfo);
-            pdata->handler_state = BCM_RESPCAPI2Cmd;
+       	case BCM_SendCAPI2Cmd:
+       	{
+           		KrilManualSelectInfo_t *tdata = (KrilManualSelectInfo_t *)pdata->ril_cmd->data;
+          		KRIL_DEBUG(DBG_INFO, " manualRat:%d\n", tdata->manualRat);            
+                       if (RAT_GSM == tdata->manualRat || RAT_UMTS == tdata->manualRat)
+           	       {
+               			KRIL_SetInNetworkSelectHandler( TRUE );
+               			CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());
+               			CAPI2_NetRegApi_SetPlmnSelectRat(&clientInfo, tdata->manualRat);
+               			//pdata->handler_state = BCM_MS_SetPlmnSelectRat;
+
+				KRIL_DEBUG(DBG_INFO, "Manual Select with RAT : network_info %s, Permanent Automatic =%d\n", tdata->networkInfo, tdata->permanentAutoEnable);
+				KRIL_SetNetworkSelectTID( GetNewTID() );
+  	         		CAPI2_InitClientInfo(&clientInfo, KRIL_GetNetworkSelectTID(), GetClientID());
+				if( tdata->permanentAutoEnable == 1) //Permanent Automatic Enabled
+  	         			CAPI2_NetRegApi_PlmnSelect(&clientInfo, FALSE, PLMN_SELECT_MANUAL_FORCE_AUTO, PLMN_FORMAT_NUMERIC, (char *)tdata->networkInfo);
+				else
+  	         			CAPI2_NetRegApi_PlmnSelect(&clientInfo, FALSE, PLMN_SELECT_MANUAL, PLMN_FORMAT_NUMERIC, (char *)tdata->networkInfo);
+  	         		pdata->handler_state = BCM_RESPCAPI2Cmd;							
+           		}
+			else if(RAT_NOT_AVAILABLE == tdata->manualRat )
+			{
+            			KRIL_SetInNetworkSelectHandler( TRUE );
+				KRIL_DEBUG(DBG_INFO, "Manual Select : network_info:%s, Permanent Automatic =%d\n", tdata->networkInfo, tdata->permanentAutoEnable);
+           			KRIL_SetNetworkSelectTID( GetNewTID() );
+           			CAPI2_InitClientInfo(&clientInfo, KRIL_GetNetworkSelectTID(), GetClientID());
+				if( tdata->permanentAutoEnable == 1) //Permanent Automatic Enabled
+           				CAPI2_NetRegApi_PlmnSelect(&clientInfo, FALSE, PLMN_SELECT_MANUAL_FORCE_AUTO, PLMN_FORMAT_NUMERIC, (char *)tdata->networkInfo);
+				else
+           				CAPI2_NetRegApi_PlmnSelect(&clientInfo, FALSE, PLMN_SELECT_MANUAL, PLMN_FORMAT_NUMERIC, (char *)tdata->networkInfo);
+
+				pdata->handler_state = BCM_RESPCAPI2Cmd;
+			}
+           		else
+           		{
+               			pdata->handler_state = BCM_ErrorCAPI2Cmd;
+           		}
         }
         break;
 
@@ -1133,23 +1166,25 @@ void KRIL_QueryAvailableNetworksHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_r
             KRIL_DEBUG(DBG_INFO, "BCM_RESPCAPI2Cmd :: num_of_plmn:%d\n", rsp->num_of_plmn);
             for(i = 0 ; i < rsp->num_of_plmn ; i++)
             {
-                for (j = 0 ; j < i ; j++)
-                {
-                     KRIL_DEBUG(DBG_INFO, "BCM_RESPCAPI2Cmd :: mcc[%d]:%d mcc[%d]:%d\n", i, rsp->searched_plmn[i].mcc, j, rsp->searched_plmn[j].mcc);
-                     KRIL_DEBUG(DBG_INFO, "BCM_RESPCAPI2Cmd :: mnc[%d]:%d mnc[%d]:%d\n", i, rsp->searched_plmn[i].mnc, j, rsp->searched_plmn[j].mnc);
-                     if ((rsp->searched_plmn[i].mcc == rsp->searched_plmn[j].mcc) &&
-                     	    (rsp->searched_plmn[i].mnc == rsp->searched_plmn[j].mnc))
-                     {
-                         match = TRUE;
-                         break;
-                     }
-                     match = FALSE;
-                }
-                if (TRUE == match)
-                {
-                    match = FALSE;
-                    continue;
-                }
+				//This code is moved to URIL(bcm_uril.c) for handling by Sales Coce.
+				//Hong Seongmin (alex46.hong)
+                //	for (j = 0 ; j < i ; j++)
+                //	{			 
+                //     		KRIL_DEBUG(DBG_INFO, "BCM_RESPCAPI2Cmd :: mcc[%d]:%d mcc[%d]:%d\n", i, rsp->searched_plmn[i].mcc, j, rsp->searched_plmn[j].mcc);
+                //     		KRIL_DEBUG(DBG_INFO, "BCM_RESPCAPI2Cmd :: mnc[%d]:%d mnc[%d]:%d\n", i, rsp->searched_plmn[i].mnc, j, rsp->searched_plmn[j].mnc);
+                //     		if ((rsp->searched_plmn[i].mcc == rsp->searched_plmn[j].mcc) &&
+                //     	    		(rsp->searched_plmn[i].mnc == rsp->searched_plmn[j].mnc))
+                //     		{
+                //         		match = TRUE;
+                //         		break;
+                //     		}
+                //     		match = FALSE;
+                //	}
+                //	if (TRUE == match)
+                //	{
+                //    		match = FALSE;
+                //    		continue;
+                //	}
                 rdata->available_plmn[rdata->num_of_plmn].mcc = rsp->searched_plmn[i].mcc;
                 rdata->available_plmn[rdata->num_of_plmn].mnc = rsp->searched_plmn[i].mnc;
                 rdata->available_plmn[rdata->num_of_plmn].network_type = rsp->searched_plmn[i].network_type;

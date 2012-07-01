@@ -35,7 +35,8 @@
 // @comm None
 //
 // -----------------------------------------------------------------------------
-#define BCM_SRIL_CHECK_PIN_STATUS  	0x500#define BCM_SRIL_CHECK_PIN2_FDN		0x501
+#define BCM_SRIL_CHECK_PIN_STATUS  	0x500
+#define BCM_SRIL_CHECK_PIN2_FDN		0x501
 
 #define SI_CHV_NOT_AVAILABLE 0
 #define SI_CHV_NEEDED 1
@@ -1373,6 +1374,16 @@ void KRIL_SRIL_AccessPhoneBookEnteryHandler(void *ril_cmd, Kril_CAPI2Info_t *cap
 
 			
 		}
+		else
+		{
+	                KRIL_DEBUG(DBG_ERROR,"HJKIM > RIL_REQUEST_ACCESS_PHONEBOOK_ENTRY: EDIT :email deleted: %d \n");
+
+			usim_adn_ext_data = kmalloc(sizeof(USIM_PBK_EXT_DATA_t),GFP_KERNEL);
+			memset(usim_adn_ext_data , 0x00 , sizeof(USIM_PBK_EXT_DATA_t));
+			usim_adn_ext_data->num_of_email=0;
+			usim_adn_ext_data->email[0].alpha_size = 0;
+			usim_adn_ext_data->email[0].alpha_coding = 0;
+		}
 		CAPI2_PBK_SendUpdateEntryReq(GetNewTID(), GetClientID(), pbk_id,
 			special_fax_num, index, type_of_number,
 			(char *)cmd_data->number, alpha_coding, alpha_size, (UInt8 *)cmd_data->alphaTag,
@@ -1390,7 +1401,12 @@ void KRIL_SRIL_AccessPhoneBookEnteryHandler(void *ril_cmd, Kril_CAPI2Info_t *cap
 
 
                 KRIL_DEBUG(DBG_ERROR,"HJKIM > RIL_REQUEST_ACCESS_PHONEBOOK_ENTRY: DELETE  \n");
-            
+ 		usim_adn_ext_data = kmalloc(sizeof(USIM_PBK_EXT_DATA_t),GFP_KERNEL);
+		memset(usim_adn_ext_data , 0x00 , sizeof(USIM_PBK_EXT_DATA_t));
+		usim_adn_ext_data->num_of_email=0;
+		usim_adn_ext_data->email[0].alpha_size = 0;
+		usim_adn_ext_data->email[0].alpha_coding = 0;
+           
             CAPI2_PBK_SendUpdateEntryReq(GetNewTID(), GetClientID(), pbk_id,
                 special_fax_num, index, 0,
                 NULL, 0, 0, NULL,
@@ -2179,7 +2195,9 @@ void KRIL_SRIL_SetBandHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp, KrilSr
             break;
         }
 	}
-}/*- Band Selection sh0515.lee -*/
+}
+
+/*- Band Selection sh0515.lee -*/
 /*+ Ciphering Mode sh0515.lee /  Integrity Mode sh0515.lee +*/
 
 void KRIL_SRIL_SetStackClasssMarkHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp, KrilStackNvramClassMark_t *tdata)
@@ -2238,10 +2256,54 @@ void KRIL_SRIL_SetStackClasssMarkHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_
         }
 	}
 
-}/*- new Ciphering Mode sh0515.lee /  Integrity Mode sh0515.lee -*/CAPI2_MS_Element_t KRIL_SRIL_GetStackClasssMarkHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp, KrilStackNvramClassMark_t *tdata){	KRIL_CmdList_t *pdata = (KRIL_CmdList_t*)ril_cmd;	ClientInfo_t clientInfo;	CAPI2_MS_Element_t data;	KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_GetStackClasssMarkHandler \n");	switch (pdata->handler_state)	{		case BCM_SendCAPI2Cmd:		{	        	CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());	        	CAPI2_MsDbApi_GetElement ( &clientInfo, MS_STACK_ELEM_NVRAM_CLASSMARK);	        	pdata->handler_state = BCM_RESPCAPI2Cmd;	        	break;		}				case BCM_RESPCAPI2Cmd:		{			CAPI2_MS_Element_t* rsp = (CAPI2_MS_Element_t*)capi2_rsp->dataBuf;    			if (!rsp)    			{        			KRIL_DEBUG(DBG_ERROR,"capi2_rsp->dataBuf is NULL, Error!!\n");        			pdata->handler_state = BCM_ErrorCAPI2Cmd;        			return data;    			}			if (rsp->inElemType != MS_STACK_ELEM_NVRAM_CLASSMARK)			{				KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_GetStackClasssMarkHandler : inElemType Error!! inElemType:%d\n",rsp->inElemType);				pdata->handler_state = BCM_ErrorCAPI2Cmd;        			return data;			}			switch(tdata->classmark_id)			{				case KRIL_CIPHERING_MODE:
+}
+
+
+
+/*- new Ciphering Mode sh0515.lee /  Integrity Mode sh0515.lee -*/
+CAPI2_MS_Element_t KRIL_SRIL_GetStackClasssMarkHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp, KrilStackNvramClassMark_t *tdata)
+{
+	KRIL_CmdList_t *pdata = (KRIL_CmdList_t*)ril_cmd;
+	ClientInfo_t clientInfo;
+	CAPI2_MS_Element_t data;
+
+	KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_GetStackClasssMarkHandler \n");
+
+	switch (pdata->handler_state)
+	{
+		case BCM_SendCAPI2Cmd:
+		{
+	        	CAPI2_InitClientInfo(&clientInfo, GetNewTID(), GetClientID());
+	        	CAPI2_MsDbApi_GetElement ( &clientInfo, MS_STACK_ELEM_NVRAM_CLASSMARK);
+	        	pdata->handler_state = BCM_RESPCAPI2Cmd;
+	        	break;
+		}
+		
+		case BCM_RESPCAPI2Cmd:
+		{
+			CAPI2_MS_Element_t* rsp = (CAPI2_MS_Element_t*)capi2_rsp->dataBuf;
+
+    			if (!rsp)
+    			{
+        			KRIL_DEBUG(DBG_ERROR,"capi2_rsp->dataBuf is NULL, Error!!\n");
+        			pdata->handler_state = BCM_ErrorCAPI2Cmd;
+        			return data;
+    			}
+			if (rsp->inElemType != MS_STACK_ELEM_NVRAM_CLASSMARK)
+			{
+				KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_GetStackClasssMarkHandler : inElemType Error!! inElemType:%d\n",rsp->inElemType);
+				pdata->handler_state = BCM_ErrorCAPI2Cmd;
+        			return data;
+			}
+
+
+			switch(tdata->classmark_id)
+			{
+				case KRIL_CIPHERING_MODE:
             			//data.inElemType = MS_STACK_ELEM_NVRAM_CLASSMARK;
             			data.data_u.stackClassmark.uasConfigParams.ciphering_updated = rsp->data_u.stackClassmark.uasConfigParams.ciphering_updated;
-					data.data_u.stackClassmark.uasConfigParams.ciphering_support = rsp->data_u.stackClassmark.uasConfigParams.ciphering_support;					return data;
+					data.data_u.stackClassmark.uasConfigParams.ciphering_support = rsp->data_u.stackClassmark.uasConfigParams.ciphering_support;
+					return data;
 				case KRIL_INTEGRATE_MODE:
             			//data.inElemType = MS_STACK_ELEM_NVRAM_CLASSMARK;
             			data.data_u.stackClassmark.uasConfigParams.integrity_updated = rsp->data_u.stackClassmark.uasConfigParams.integrity_updated;
@@ -2250,8 +2312,217 @@ void KRIL_SRIL_SetStackClasssMarkHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_
 				default:
 		            		KRIL_DEBUG(DBG_ERROR, "wrong classmark id:%lu error...!\n", tdata->classmark_id);
 		            		pdata->handler_state = BCM_ErrorCAPI2Cmd;
-					return data;						}					}		default:		{	        	KRIL_DEBUG(DBG_ERROR, "handler_state:%lu error...!\n", pdata->handler_state);	        	pdata->handler_state = BCM_ErrorCAPI2Cmd;	        	return data;
-		}	}	return data;}
+					return data;
+			
+			}			
 
-/*- Ciphering Mode sh0515.lee /  Integrity Mode sh0515.lee -*/
-
+		}
+
+		default:
+		{
+	        	KRIL_DEBUG(DBG_ERROR, "handler_state:%lu error...!\n", pdata->handler_state);
+	        	pdata->handler_state = BCM_ErrorCAPI2Cmd;
+	        	return data;
+		}
+	}
+	return data;
+}
+
+
+int KRIL_SRIL_requestOemSvcGetHsdpaPhyCategoryHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
+{
+	KRIL_CmdList_t *pdata = (KRIL_CmdList_t*)ril_cmd;
+	KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_requestOemSvcGetHsdpaPhyCategoryHandler \n");
+
+	switch (pdata->handler_state)
+	{
+		case BCM_SendCAPI2Cmd:
+		{
+			UInt32 NewTID;
+			UInt32 ClientID;
+			NewTID = GetNewTID();
+			ClientID = GetClientID();
+			KRIL_DEBUG(DBG_ERROR,"BCM_SendCAPI2Cmd  NewTID=%d, ClientID=%d\n",NewTID,ClientID);
+	        	CAPI2_SYSPARM_GetHSDPAPHYCategory(NewTID, ClientID);
+	        	pdata->handler_state = BCM_GET_HSDPA_PHY_CATEGORY;
+	        	break;
+		}
+
+		case BCM_GET_HSDPA_PHY_CATEGORY:
+		{
+    			CAPI2_SYSPARM_GetHSDPAPHYCategory_Rsp_t* rsp;
+    			KRIL_DEBUG(DBG_ERROR,"BCM_GET_HSDPA_PHY_CATEGORY\n");
+			rsp = (CAPI2_SYSPARM_GetHSDPAPHYCategory_Rsp_t*)capi2_rsp->dataBuf;
+    			if (!rsp)
+    			{
+        			KRIL_DEBUG(DBG_ERROR,"capi2_rsp->dataBuf is NULL, Error!!\n");
+        			pdata->handler_state = BCM_ErrorCAPI2Cmd;
+        			return HSxPA_CATEGORY_ERROR; // error
+    			}
+    			KRIL_DEBUG(DBG_ERROR,"BCM_GET_HSDPA_PHY_CATEGORY, rsp->val=%d\n",rsp->val);
+
+	        	pdata->handler_state = BCM_RESPCAPI2Cmd;
+			return rsp->val;
+
+	        	break;
+		}
+
+		case BCM_RESPCAPI2Cmd:
+		{
+    			KRIL_DEBUG(DBG_ERROR,"BCM_FinishCAPI2Cmd\n");
+    			pdata->handler_state = BCM_FinishCAPI2Cmd;
+    			return HSxPA_CATEGORY_ERROR;//error
+		}
+		default:
+		{
+	        	KRIL_DEBUG(DBG_ERROR, "handler_state:%lu error...!\n", pdata->handler_state);
+	        	pdata->handler_state = BCM_ErrorCAPI2Cmd;
+	        	return HSxPA_CATEGORY_ERROR; //error
+		}
+	}
+	return HSxPA_CATEGORY_ERROR; //error
+}
+
+void KRIL_SRIL_requestOemSvcSetHsdpaPhyCategoryHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp,  int hsdpa_phy_cat )
+{
+	KRIL_CmdList_t *pdata = (KRIL_CmdList_t*)ril_cmd;
+	KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_requestOemSvcSetHsdpaPhyCategoryHandler. hsdpa_phy_cat=%d \n",hsdpa_phy_cat);
+
+	switch (pdata->handler_state)
+	{
+		case BCM_SendCAPI2Cmd:
+		{
+			struct file *filp;
+			mm_segment_t fs;
+			int ret;
+			UInt32 NewTID;
+			UInt32 ClientID;
+			
+			filp = filp_open("/data/hsdpa.dat",  O_RDWR|O_CREAT, 0);
+			if (IS_ERR(filp))
+			{
+				KRIL_DEBUG(DBG_ERROR,"File open(create) fail\n");
+			}
+			else
+			{
+				fs = get_fs();
+				set_fs(get_ds());
+				ret = filp->f_op->write(filp, (char __user *)&hsdpa_phy_cat, sizeof(hsdpa_phy_cat), &filp->f_pos);
+				// The saved file will be check in KRIL_InitCmdHandler() when power on device.
+				set_fs(fs);
+				filp_close(filp, NULL);
+			}
+
+			NewTID = GetNewTID();
+			ClientID = GetClientID();
+			KRIL_DEBUG(DBG_ERROR,"BCM_SendCAPI2Cmd  NewTID=%d, ClientID=%d\n",NewTID,ClientID);
+			CAPI2_SYSPARM_SetHSDPAPHYCategory(NewTID, ClientID, hsdpa_phy_cat );
+			pdata->handler_state = BCM_RESPCAPI2Cmd;
+			break;
+		}
+
+		case BCM_RESPCAPI2Cmd:
+		{
+    			KRIL_DEBUG(DBG_ERROR,"BCM_FinishCAPI2Cmd\n");
+    			pdata->handler_state = BCM_FinishCAPI2Cmd;
+    			return HSxPA_CATEGORY_ERROR;//error
+		}
+		default:
+		{
+	        	KRIL_DEBUG(DBG_ERROR, "handler_state:%lu error...!\n", pdata->handler_state);
+	        	pdata->handler_state = BCM_ErrorCAPI2Cmd;
+	        	return HSxPA_CATEGORY_ERROR; //error
+		}
+	}
+	return HSxPA_CATEGORY_ERROR; //error
+}
+
+int KRIL_SRIL_requestOemSvcGetHsupaPhyCategoryHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp)
+{
+	KRIL_CmdList_t *pdata = (KRIL_CmdList_t*)ril_cmd;
+	KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_requestOemSvcGetHsupaPhyCategoryHandler \n");
+
+	switch (pdata->handler_state)
+	{
+		case BCM_SendCAPI2Cmd:
+		{
+			UInt32 NewTID;
+			UInt32 ClientID;
+			NewTID = GetNewTID();
+			ClientID = GetClientID();
+			KRIL_DEBUG(DBG_ERROR,"BCM_SendCAPI2Cmd  NewTID=%d, ClientID=%d\n",NewTID,ClientID);
+	        	CAPI2_SYSPARM_GetHSUPAPHYCategory(NewTID, ClientID);
+	        	pdata->handler_state = BCM_GET_HSUPA_PHY_CATEGORY;
+	        	break;
+		}
+
+		case BCM_GET_HSUPA_PHY_CATEGORY:
+		{
+    			CAPI2_SYSPARM_GetHSUPAPHYCategory_Rsp_t* rsp;
+    			KRIL_DEBUG(DBG_ERROR,"BCM_GET_HSUPA_PHY_CATEGORY\n");
+			rsp = (CAPI2_SYSPARM_GetHSUPAPHYCategory_Rsp_t*)capi2_rsp->dataBuf;
+    			if (!rsp)
+    			{
+        			KRIL_DEBUG(DBG_ERROR,"capi2_rsp->dataBuf is NULL, Error!!\n");
+        			pdata->handler_state = BCM_ErrorCAPI2Cmd;
+        			return HSxPA_CATEGORY_ERROR; // error
+    			}
+    			KRIL_DEBUG(DBG_ERROR,"BCM_GET_HSUPA_PHY_CATEGORY, rsp->val=%d\n",rsp->val);
+
+	        	pdata->handler_state = BCM_RESPCAPI2Cmd;
+			return rsp->val;
+
+	        	break;
+		}
+
+		case BCM_RESPCAPI2Cmd:
+		{
+    			KRIL_DEBUG(DBG_ERROR,"BCM_FinishCAPI2Cmd\n");
+    			pdata->handler_state = BCM_FinishCAPI2Cmd;
+    			return HSxPA_CATEGORY_ERROR;//error
+		}
+		default:
+		{
+	        	KRIL_DEBUG(DBG_ERROR, "handler_state:%lu error...!\n", pdata->handler_state);
+	        	pdata->handler_state = BCM_ErrorCAPI2Cmd;
+	        	return HSxPA_CATEGORY_ERROR; //error
+		}
+	}
+	return HSxPA_CATEGORY_ERROR; //error
+}
+
+void KRIL_SRIL_requestOemSvcSetHsupaPhyCategoryHandler(void *ril_cmd, Kril_CAPI2Info_t *capi2_rsp,  int hsupa_phy_cat )
+{
+	KRIL_CmdList_t *pdata = (KRIL_CmdList_t*)ril_cmd;
+	KRIL_DEBUG(DBG_ERROR,"KRIL_SRIL_requestOemSvcSetHsupaPhyCategoryHandler. hsupa_phy_cat=%d \n",hsupa_phy_cat);
+
+	switch (pdata->handler_state)
+	{
+		case BCM_SendCAPI2Cmd:
+		{
+			UInt32 NewTID;
+			UInt32 ClientID;
+			NewTID = GetNewTID();
+			ClientID = GetClientID();
+			KRIL_DEBUG(DBG_ERROR,"BCM_SendCAPI2Cmd  NewTID=%d, ClientID=%d\n",NewTID,ClientID);
+			CAPI2_SYSPARM_SetHSUPAPHYCategory(NewTID, ClientID, hsupa_phy_cat );
+	        	pdata->handler_state = BCM_RESPCAPI2Cmd;
+	        	break;
+		}
+
+		case BCM_RESPCAPI2Cmd:
+		{
+    			KRIL_DEBUG(DBG_ERROR,"BCM_FinishCAPI2Cmd\n");
+    			pdata->handler_state = BCM_FinishCAPI2Cmd;
+    			return HSxPA_CATEGORY_ERROR;//error
+		}
+		default:
+		{
+	        	KRIL_DEBUG(DBG_ERROR, "handler_state:%lu error...!\n", pdata->handler_state);
+	        	pdata->handler_state = BCM_ErrorCAPI2Cmd;
+	        	return HSxPA_CATEGORY_ERROR; //error
+		}
+	}
+	return HSxPA_CATEGORY_ERROR; //error
+}
+
