@@ -9,4 +9,7 @@ export PATH=$(pwd)/toolchain/arm-eabi-4.4.3/bin:$PATH
 
 cd common
 
-make distclean; echo 'compilations and configurations clear!!!'; sleep 5
+make distclean
+find . ./ -name '.*' -exec rm -Rf {} \;
+find . ../modules -name '.*' -exec rm -Rf {} \;
+echo 'compilations and configurations clear!!!'; sleep 5

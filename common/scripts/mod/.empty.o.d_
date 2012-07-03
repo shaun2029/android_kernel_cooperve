@@ -1,1 +1,0 @@
-empty.o: scripts/mod/empty.c include/generated/autoconf.h
