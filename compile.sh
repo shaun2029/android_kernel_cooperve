@@ -11,26 +11,22 @@ export PATH=$(pwd)/toolchain/arm-eabi-4.4.3/bin:$PATH
 
 cd common
 
-if [ -f .config ]; then
-	make clean 
+if [ -f .config ]; then 
+	make clean && make xconfig
 else
-	make distclean && make bcm21553_cooperve_defconfig
+	make mrproper && make bcm21553_cooperve_defconfig && make xconfig
 fi
 
-make xconfig && make silentoldconfig && make modules CONFIG_DEBUG_SECTION_MISMATCH=y -j`grep processor /proc/cpuinfo | wc -l` 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-modules.log
-
-find . ../modules -name '*.ko' -exec cp -v {} ../Modules_OutPut/system/lib/modules \;
-echo 'Modules Compiled and stored in folder ./Modules_OutPut'; echo 'Hit <Enter> to compile Kernel'; read
-
-make clean && make zImage CONFIG_DEBUG_SECTION_MISMATCH=y -j`grep processor /proc/cpuinfo | wc -l` 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make-kernel.log
+make silentoldconfig && make modules zImage CONFIG_DEBUG_SECTION_MISMATCH=y -j`grep processor /proc/cpuinfo | wc -l` 2>&1 | tee ../logs/$(date +%Y%m%d-%H%M)-make.log && find . ../modules -name '*.ko' -exec cp -v {} ../Modules_OutPut/system/lib/modules \;
 
 cd ..
 
 cp ./common/arch/arm/boot/zImage ./Kernel_OutPut/
 
 if [ -f ./Kernel_OutPut/zImage ]; then
-	echo 'Kernel Compiled and stored in folder ./Kernel_OutPut'
+	echo 'Kernel and Modules Compiled and stored in folders ./Kernel_OutPut ./Modules_OutPut'
 else
 	echo 'Compile Fail'
 fi
+
 echo 'Hit <Enter> to continue!!!'; read
