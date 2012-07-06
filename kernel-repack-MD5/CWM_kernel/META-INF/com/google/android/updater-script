@@ -1,0 +1,22 @@
+ui_print("");
+ui_print("Kernel Rafael.Baugis");
+ui_print("");
+
+package_extract_file("bmlunlock", "bmlunlock");
+package_extract_file("boot.img", "boot.img");
+set_perm(0, 0, 0755, "bmlunlock");
+
+mount("vfat", "/dev/block/mmcblk0p1", "/sdcard", "rw");
+
+ui_print("Gravando Boot.img");
+run_program("bmlunlock");
+run_program("/system/bin/dd", "if=boot.img", "of=/dev/block/bml7");
+
+ui_print("Copiando modulos");
+mount("rfs", "EMMC", "/dev/block/stl9", "/system");
+package_extract_dir("system", "/system");
+set_perm_recursive(0, 2000, 0755, 0755, "/system/lib/modules");
+set_perm_recursive(0, 0, 0754, 0754, "/system/etc/init.d");
+
+ui_print("Pronto. Reinicie o telefone");
+
