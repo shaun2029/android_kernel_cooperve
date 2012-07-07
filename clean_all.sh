@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -Rf ./logs/ ./kernel-repack-MD5/*-kernel.* ./kernel-repack-MD5/boot.im* ./kernel-repack-MD5/zImage ./kernel-repack-MD5/ramdisk; clear
+rm -Rf ./logs/ ./kernel-repack-MD5/*-kernel.* ./kernel-repack-MD5/boot.im* ./kernel-repack-MD5/zImage ./kernel-repack-MD5/kernel ./kernel-repack-MD5/ramdisk; clear
 rm -Rf ./kernel-repack-MD5/CWM_kernel/boot.img ./kernel-repack-MD5/CWM_kernel/system/lib/modules/*.ko; clear
 
 export ARCH=arm
