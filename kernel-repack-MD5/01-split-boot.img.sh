@@ -14,6 +14,6 @@ else
 fi
 perl split_bootimg.pl ../boot.img && rm ../boot.img; sleep 5
 mv boot.img-kernel ../
-gzip -t -v boot.img-ramdisk.cpio.gz; && mv boot.img-ramdisk.cpio.gz ../; clear
-lzma -t -v boot.img-ramdisk.cpio.gz; && mv boot.img-ramdisk.cpio.gz ../boot.img-ramdisk.cpio.lzma; clear
+gzip -t -v boot.img-ramdisk.cpio.gz && mv boot.img-ramdisk.cpio.gz ../; clear
+lzma -t -v boot.img-ramdisk.cpio.gz && mv boot.img-ramdisk.cpio.gz ../boot.img-ramdisk.cpio.lzma; clear
 cd ..

@@ -39,9 +39,9 @@ fi
 
 if [ -f run.sh ] && [ -f md5 ]; then
 	rm ../boot.img ../PDA-kernel.tar ../CWM-kernel.zip; clear; sleep 5
-	chmod +x run.sh mkbootimg; && ./run.sh && rm run.sh md5
+	chmod +x run.sh mkbootimg && ./run.sh && rm run.sh md5
 	cd ..
-	tar -cvf PDA-kernel.tar boot.img; && mv boot.img CWM_kernel/; && cd CWM_kernel; && zip -r ../CWM-kernel.zip .; && rm -Rf boot.img system/lib/modules/*.ko
+	tar -cvf PDA-kernel.tar boot.img && mv boot.img CWM_kernel/ && cd CWM_kernel && zip -r ../CWM-kernel.zip . && rm -Rf boot.img system/lib/modules/*.ko
 	cd ..
 	echo 'CWM-kernel <-> READY'
 	echo 'PDA-kernel <-> READY'
