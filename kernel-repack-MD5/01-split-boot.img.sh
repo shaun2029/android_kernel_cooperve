@@ -8,12 +8,12 @@ else
 fi
 cd mkbootimg
 if [ -f ../boot.img ]; then
-	rm ../boot.img-ramdisk.gz ../boot.img-ramdisk.lzma ../boot.img-kernel; clear; sleep 5
+	rm ../boot.img-ramdisk.cpio.gz ../boot.img-ramdisk.cpio.lzma ../boot.img-kernel; clear; sleep 5
 else
 	echo 'cant read file'; sleep 5; exit
 fi
 perl split_bootimg.pl ../boot.img && rm ../boot.img; sleep 5
 mv boot.img-kernel ../
-gzip -t -v boot.img-ramdisk.gz && mv boot.img-ramdisk.gz ../; clear
-lzma -t -v boot.img-ramdisk.gz && mv boot.img-ramdisk.gz ../boot.img-ramdisk.lzma; clear
+gzip -t -v boot.img-ramdisk.cpio.gz; && mv boot.img-ramdisk.cpio.gz ../; clear
+lzma -t -v boot.img-ramdisk.cpio.gz; && mv boot.img-ramdisk.cpio.gz ../boot.img-ramdisk.cpio.lzma; clear
 cd ..

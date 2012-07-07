@@ -78,8 +78,8 @@ my $s_offset = $r_offset + ($m * $PAGE_SIZE);
 
 (my $base = $IMAGE_FN) =~ s/.*\/(.*)$/$1/;
 my $k_file = $base . "-kernel";
-my $r_file = $base . "-ramdisk.gz";
-my $s_file = $base . "-second.gz";
+my $r_file = $base . "-ramdisk.cpio.gz";
+my $s_file = $base . "-second.cpio.gz";
 
 # The kernel is always there
 print "Writing $k_file ...";
