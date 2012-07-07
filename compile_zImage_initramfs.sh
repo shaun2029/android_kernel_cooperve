@@ -17,10 +17,6 @@ fi
 
 export INITRAMFS_SOURCE="$PWD/kernel-repack-MD5/boot.img-ramdisk.cpio"
 
-echo $INITRAMFS_SOURCE
-
-read
-
 cd common
 
 if [ -f .config ]; then 
