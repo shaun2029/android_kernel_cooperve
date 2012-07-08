@@ -1,10 +1,15 @@
 #!/bin/bash
 
-export loop=4
+#######################
+# set value to 1 or 2 #
+#######################
 
-while [ "$loop >= 1" ]; do
+export compile=1
+
+while [ $compile = '1' ]; do
 	./compile_boot.img.sh
-	loop=loop-1
 done
 
-
+while [ $compile = '2' ]; do
+	./compile_zImage.sh
+done
