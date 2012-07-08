@@ -1,6 +1,27 @@
 #!/bin/bash
 
-rm -Rf ./kernel-repack-MD5/zImage ./kernel-repack-MD5/kernel ./kernel-repack-MD5/CWM_kernel/system/lib/modules/*.ko; clear
+if [ -f kernel-repack-MD5/03-compress-ramdisk.gz.sh ] && [ -f kernel-repack-MD5/04-creat-package.sh ]; then
+	echo 'Kernel Repacker	- OK'; sleep 1
+else
+	echo 'Kernel Repacker	- Faill'; sleep 5; exit
+fi
+
+if [ -f toolchain/arm-eabi-4.4.3/bin/arm-eabi-gcc ]; then
+	echo 'CROSS_COMPILER	- OK'; sleep 1
+else
+	echo 'CROSS_COMPILER	- Faill'; sleep 5; exit
+fi
+
+if [ -f common/Makefile ] && [ -f modules/Makefile ]; then
+	echo 'Kernel Sources	- OK'; sleep 1
+else
+	echo 'Kernel Sources	- Faill'; sleep 5; exit
+fi
+
+cd kernel-repack-MD5
+rm -Rf zImage kernel CWM_kernel/system/lib/modules/*.ko; clear
+cd ..
+
 mkdir logs; clear
 
 export ARCH=arm
