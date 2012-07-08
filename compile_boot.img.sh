@@ -5,7 +5,7 @@ mkdir logs; clear
 
 export ARCH=arm
 export SUBARCH=arm
-export LOCALVERSION="-45"
+export LOCALVERSION=-45
 export CROSS_COMPILE=arm-eabi-
 export PATH=$(pwd)/toolchain/arm-eabi-4.4.3/bin:$PATH
 

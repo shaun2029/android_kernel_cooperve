@@ -36,6 +36,7 @@ else
 	cd ..
 	rm *-zImage.tar *-modules.zip; clear 
 	tar cvf PDA-zImage.tar zImage && rm zImage; cd CWM_kernel && zip -r ../CWM-modules.zip . && rm -Rf system/lib/modules/*.ko
+	cd ..
 	mv CWM-modules.zip ../$(date +%Y%m%d-%H%M)-CWM-modules.zip
 	mv PDA-zImage.tar ../$(date +%Y%m%d-%H%M)-PDA-zImage.tar
 	echo 'CWM-modules <-> READY'
