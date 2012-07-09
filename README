@@ -4,11 +4,9 @@ To compile kernel use Linux Debian x86_64 or ix86
 
 1 execute install_dep.sh to install the packages needed to compile kernel.
 
-2 execute compile.sh, to configure and compile kernel.
+2 ( Optional to edit ramdisk ) enter in kernel-repack-MD5 execute 01-split-boot.img.sh \
+and execute 02-decompress-ramdisk.sh, edit the ramdisk, then execute 03-compress-ramdisk.*.sh
 
-3 execute 01-split-boot.img.sh
-	(Optional) execute 02-decompress-ramdisk.sh if you need edit the ramdisk, then execute 03-compress-ramdisk.sh
+3 execute compile-boot.img.sh
 
-4 execute 04-creat-boot.img.sh
-
-READY, use PDA-kernel.tar in ODIN or CWM-kernel.zip in ClockWorkMOD recovery.
+READY, use PDA-kernel.tar in ODIN or CWM-kernel-modules.zip in ClockWorkMOD recovery.
