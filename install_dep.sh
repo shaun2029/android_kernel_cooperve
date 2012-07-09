@@ -22,6 +22,12 @@ echo 'Select "armel" as cross compilation system in next screen!!!'
 echo 'hit <Enter> to continue'; read
 sudo dpkg-reconfigure dpkg-cross
 
+if [ -d ~/toolchain ]; then
+	cd ~ && git pull https://github.com/RafaelBaugis/toolchain.git
+else
+	cd ~ && git clone https://github.com/RafaelBaugis/toolchain.git
+fi	
+
 echo 'Evertyng Installed!!!'
 echo 'Hit <Enter> to Close!!!'
 read

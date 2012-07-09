@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if [ -f kernel ] && [ -f boot.img-kernel ]; then
+if [ -f zImage ] && [ -f boot.img-kernel ]; then
 	rm boot.img-kernel; clear; mv kernel boot.img-kernel; clear
 else
-	mv kernel boot.img-kernel; clear
+	mv zImage boot.img-kernel; clear
 fi
 
 cd mkbootimg
@@ -30,17 +30,10 @@ if [ -f run.sh ] && [ -f md5 ]; then
 	cd ..
 	mv CWM-boot.img-modules.zip ../$(date +%Y%m%d-%H%M)-CWM-boot.img-modules.zip
 	mv PDA-boot.img.tar ../$(date +%Y%m%d-%H%M)-PDA-boot.img.tar
-	echo 'CWM-kernel-modules <-> READY'
-	echo 'PDA-boot.img <-> READY'
+	echo 'CWM-kernel-modules.zip <-> READY'
+	echo 'PDA-boot.img.tar <-> READY'
 else
-	cd ..
-	rm *-zImage.tar *-modules.zip; clear 
-	tar cvf PDA-zImage.tar zImage && rm zImage; cd CWM_kernel && zip -r ../CWM-modules.zip . && rm -Rf system/lib/modules/*.ko
-	cd ..
-	mv CWM-modules.zip ../$(date +%Y%m%d-%H%M)-CWM-modules.zip
-	mv PDA-zImage.tar ../$(date +%Y%m%d-%H%M)-PDA-zImage.tar
-	echo 'CWM-modules <-> READY'
-	echo 'PDA-zImage <-> READY'
+	echo 'Error - Nothing Done!!!'
 fi
 
 sleep 5

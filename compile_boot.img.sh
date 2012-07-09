@@ -6,7 +6,7 @@ else
 	echo 'Kernel Repacker	- Faill'; sleep 5; exit
 fi
 
-if [ -f toolchain/arm-eabi-4.4.3/bin/arm-eabi-gcc ]; then
+if [ -f ~/toolchain/arm-eabi-4.4.3/bin/arm-eabi-gcc ]; then
 	echo 'CROSS_COMPILER	- OK'; sleep 1
 else
 	echo 'CROSS_COMPILER	- Faill'; sleep 5; exit
@@ -19,16 +19,14 @@ else
 fi
 
 cd kernel-repack-MD5
-rm -Rf zImage kernel CWM_kernel/system/lib/modules/*.ko; clear
+rm -Rf zImage boot.img-kernel CWM_kernel/boot.img CWM_kernel/system/lib/modules/*.ko; clear
 cd ..
 
 mkdir logs; clear
 
 export ARCH=arm
-export SUBARCH=arm
-export LOCALVERSION=-45
 export CROSS_COMPILE=arm-eabi-
-export PATH=$(pwd)/toolchain/arm-eabi-4.4.3/bin:$PATH
+export PATH=~/toolchain/arm-eabi-4.4.3/bin:$PATH
 
 if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] || [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.lzma ]; then
 	if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] && [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.lzma ]; then
@@ -51,12 +49,12 @@ make silentoldconfig && make modules zImage CONFIG_DEBUG_SECTION_MISMATCH=y -j`g
 
 cd ..
 
-cp ./common/arch/arm/boot/zImage ./kernel-repack-MD5/kernel
+cp ./common/arch/arm/boot/zImage ./kernel-repack-MD5/zImage
 
 if [ -f ./kernel-repack-MD5/kernel ]; then
 	cd kernel-repack-MD5 && ./04-creat-package.sh && cd ..
 else
-	echo 'Compile Fail'
+	echo 'Error - Compile Fail!!!'
 fi
 
 sleep 5
