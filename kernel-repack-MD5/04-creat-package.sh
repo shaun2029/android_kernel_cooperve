@@ -26,7 +26,7 @@ if [ -f run.sh ] && [ -f md5 ]; then
 	rm ../boot.img ../*-boot.img.tar ../*-boot.img-modules.zip; clear; sleep 5
 	chmod +x run.sh mkbootimg && ./run.sh && rm run.sh md5
 	cd ..
-	tar -cvf PDA-boot.img.tar boot.img && mv boot.img CWM_kernel/ && cd CWM_kernel && zip -r ../CWM-boot.img-modules.zip . && rm -Rf boot.img system/lib/modules/*.ko
+	tar -cvf PDA-boot.img.tar boot.img && mv boot.img CWM_kernel/ && cd CWM_kernel && zip -r ../CWM-boot.img-modules.zip . ;
 	cd ..
 	mv CWM-boot.img-modules.zip ../$(date +%Y%m%d-%H%M)-CWM-boot.img-modules.zip
 	mv PDA-boot.img.tar ../$(date +%Y%m%d-%H%M)-PDA-boot.img.tar
