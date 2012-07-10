@@ -51,7 +51,7 @@ cd ..
 
 cp ./common/arch/arm/boot/zImage ./kernel-repack-MD5/zImage
 
-if [ -f ./kernel-repack-MD5/kernel ]; then
+if [ -f ./kernel-repack-MD5/zImage ]; then
 	cd kernel-repack-MD5 && ./04-creat-package.sh && cd ..
 else
 	echo 'Error - Compile Fail!!!'

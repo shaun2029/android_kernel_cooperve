@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -f zImage ] && [ -f boot.img-kernel ]; then
-	rm boot.img-kernel; clear; mv kernel boot.img-kernel; clear
+	rm boot.img-kernel; clear; mv zImage boot.img-kernel; clear
 else
 	mv zImage boot.img-kernel; clear
 fi
