@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export ARCH=arm
-export CROSS_COMPILE=arm-eabi-
-export PATH=~/toolchain/arm-eabi-4.4.3/bin:$PATH
+export CROSS_COMPILE=arm-bcm21553-eabi-
+export PATH=~/toolchain/arm-bcm21553-eabi/bin:$PATH
 
 cd common
 
