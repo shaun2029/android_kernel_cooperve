@@ -6,7 +6,7 @@ else
 	echo 'Kernel Repacker	- Faill'; sleep 5; exit
 fi
 
-if [ -f ~/toolchain/arm-eabi-4.4.3/bin/arm-eabi-gcc ]; then
+if [ -f ~/toolchain/arm-bcm21553-eabi/bin/arm-bcm21553-eabi-gcc ]; then
 	echo 'CROSS_COMPILER	- OK'; sleep 1
 else
 	echo 'CROSS_COMPILER	- Faill'; sleep 5; exit
@@ -25,8 +25,8 @@ cd ..
 mkdir logs; clear
 
 export ARCH=arm
-export CROSS_COMPILE=arm-eabi-
-export PATH=~/toolchain/arm-eabi-4.4.3/bin:$PATH
+export CROSS_COMPILE=arm-bcm21553-eabi-
+export PATH=~/toolchain/arm-bcm21553-eabi/bin:$PATH
 
 if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] || [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.lzma ]; then
 	if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] && [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.lzma ]; then
