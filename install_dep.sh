@@ -23,7 +23,7 @@ if [ -f apt-ok ]; then
 	echo 'hit <Enter> to continue'; read
 	sudo dpkg-reconfigure dpkg-cross
 else
-	echo 'apt-gat	- FAIL'; sleep 5; exit
+	echo 'apt-get	- FAIL'; sleep 5; exit
 fi
 
 if [ -d ~/toolchain ]; then
@@ -31,6 +31,8 @@ if [ -d ~/toolchain ]; then
 else
 	cd ~ && git clone https://github.com/RafaelBaugis/toolchain
 fi
+
+sudo ./add-adb.sh
 
 echo 'Evertyng Installed!!!'
 echo 'Hit <Enter> to Close!!!'
