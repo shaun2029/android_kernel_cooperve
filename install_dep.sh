@@ -4,11 +4,12 @@ sudo apt-get update && sudo apt-get upgrade && \
 if [ "$(uname -m)" = "x86_64" ]; then
 	sudo apt-get install gnupg openjdk-6-jdk flex bison gperf libsdl1.2-dev perl sparse \
 	original-awk libesd0-dev build-essential dpkg-cross qt3-dev-tools lzma gzip zip curl \
-	libncurses5-dev zlib1g-dev ia32-libs lib32z1-dev lib32ncurses5-dev gcc-multilib g++-multilib
+	libncurses5-dev zlib1g-dev ia32-libs lib32z1-dev lib32ncurses5-dev gcc-multilib \
+	g++-multilib gettext texinfo
 else
 	sudo apt-get install gnupg openjdk-6-jdk flex bison gperf libsdl1.2-dev perl sparse \
 	original-awk libesd0-dev build-essential dpkg-cross qt3-dev-tools lzma gzip zip curl \
-	libncurses5-dev zlib1g-dev
+	libncurses5-dev zlib1g-dev gettext texinfo
 fi
 
 sudo apt-get clean && sudo apt-get autoremove && echo '' > apt-ok
