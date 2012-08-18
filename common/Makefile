@@ -189,9 +189,10 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # "make" in the configured kernel build directory always uses that.
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
-export KBUILD_BUILDHOST := $(SUBARCH)
+export KBUILD_BUILDHOST := 
 ARCH		?= $(SUBARCH)
-CROSS_COMPILE	?=
+ARCH		:= arm
+CROSS_COMPILE	:= /home/rafael/buildroot-2012.05/output/host/usr/bin/arm-linux-
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
 # Architecture as present in compile.h
@@ -338,7 +339,7 @@ MODFLAGS	= -DMODULE
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
 LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
-CFLAGS_KERNEL	=
+CFLAGS_KERNEL   = -O2 -mlittle-endian -mcpu=arm1136jf-s -march=armv6 -mtune=arm1136jf-s -mfpu=vfp
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
