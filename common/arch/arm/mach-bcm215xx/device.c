@@ -551,8 +551,9 @@ struct platform_device bcm215xx_lcdc_device = {
 
 #define BCM_CORECLK_TURBO	BCM21553_CORECLK_KHZ_832
 #define BCM_CORE_CLK_NORMAL	BCM21553_CORECLK_KHZ_312
-#define BCM_CORE_CLK_LOWAR	(104U*1000)
+#define BCM_CORE_CLK_LOWAR	(156U*1000)
 #define BCM_CORE_CLK_HIMED	(624U*1000)
+#define BCM_CORE_CLK_NITRO	(936U*1000)
 
 #if defined(CONFIG_BCM_CPU_FREQ)
 /*********************************************************************
@@ -565,6 +566,7 @@ enum {
  	BCM_NORMAL_MODE,
 	BCM_HIMED_MODE,
  	BCM_TURBO_MODE,
+ 	BCM_NITRO_MODE,
 };
 
 /* Voltage-Frequency mapping for BCM21553 CPU0 */
@@ -573,6 +575,7 @@ static struct bcm_freq_tbl bcm215xx_cpu0_freq_tbl[] = {
 	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1140000),
 	FTBL_INIT(BCM_CORE_CLK_HIMED / 1000, 1200000),
 	FTBL_INIT(BCM_CORECLK_TURBO / 1000, 1240000),
+	FTBL_INIT(BCM_CORE_CLK_NITRO / 1000, 1260000),
 };
 /* BCM21553 CPU info */
 static struct bcm_cpu_info bcm215xx_cpu_info[] = {
@@ -705,6 +708,8 @@ static void bcm215xx_avs_notify(int silicon_type)
 			1200000;
 		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
 			1240000;
+		bcm215xx_cpu0_freq_tbl[BCM_NITRO_MODE].cpu_voltage =
+			1260000;
 	}
 
 }

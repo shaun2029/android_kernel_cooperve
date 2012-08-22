@@ -10,6 +10,7 @@ else
 fi
 
 if [ -d kernel-repack-MD5/CWM_kernel/system/lib/modules ]; then
+	rm -Rf kernel-repack-MD5/CWM_kernel/system/lib/modules/*
 	cp precompiled-modules/*.ko kernel-repack-MD5/CWM_kernel/system/lib/modules
 	find ./common ./modules -name '*.ko' -exec mv -v {} kernel-repack-MD5/CWM_kernel/system/lib/modules \;
 else
