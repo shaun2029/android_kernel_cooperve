@@ -1,4 +1,0 @@
-#!/system/bin/sh
-# activates modules needed by droidwall's logging function
-cd /system/lib/modules
-insmod ipt_LOG.ko
