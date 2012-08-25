@@ -6,7 +6,7 @@ if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] || [ -f kernel-repack-MD5/b
 	fi
 	echo 'have ramdisk'; sleep 5
 else
-	cd kernel-repack-MD5/ && ./03-compress-ramdisk.gz.sh; rm boot.img-kernel; cd ..
+	cd kernel-repack-MD5/ && ./03-compress-ramdisk.lzma.sh; rm boot.img-kernel; cd ..
 fi
 
 if [ -d kernel-repack-MD5/CWM_kernel/system/lib/modules ]; then
