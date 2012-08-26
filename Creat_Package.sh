@@ -13,10 +13,12 @@ if [ -d kernel-repack-MD5/CWM_kernel/system/lib/modules ]; then
 	rm -Rf kernel-repack-MD5/CWM_kernel/system/lib/modules/*
 	cp precompiled-modules/*.ko kernel-repack-MD5/CWM_kernel/system/lib/modules
 	find ./common ./modules -name '*.ko' -exec mv -v {} kernel-repack-MD5/CWM_kernel/system/lib/modules \;
+	mv kernel-repack-MD5/CWM_kernel/system/lib/modules/bcm4330.ko kernel-repack-MD5/CWM_kernel/system/lib/modules/dhd.ko
 else
 	mkdir -p kernel-repack-MD5/CWM_kernel/system/lib/modules
 	cp precompiled-modules/*.ko kernel-repack-MD5/CWM_kernel/system/lib/modules
 	find ./common ./modules -name '*.ko' -exec mv -v {} kernel-repack-MD5/CWM_kernel/system/lib/modules \;
+	mv kernel-repack-MD5/CWM_kernel/system/lib/modules/bcm4330.ko kernel-repack-MD5/CWM_kernel/system/lib/modules/dhd.ko
 fi
 
 mv ./common/arch/arm/boot/zImage ./kernel-repack-MD5/zImage
