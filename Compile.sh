@@ -13,4 +13,4 @@ make mrproper && make bcm21553_cooperve_defconfig && make xconfig
 echo "Ready to compile? Hit <Enter> to Continue or <Ctrl>+<C> to Cancel!";
 sleep 1 && read
 
-make
+make CONFIG_DEBUG_SECTION_MISMATCH=y -j`grep processor /proc/cpuinfo | wc -l`
