@@ -1,0 +1,8 @@
+#!/sbin/sh
+
+/sbin/busybox rm -Rf /etc
+/sbin/busybox mkdir -p /etc
+/sbin/busybox mkdir -p /etc/init.d
+/sbin/busybox cp lib/scripts/* /etc/init.d/
+/sbin/busybox cp res/recovery.fstab /etc/recovery.fstab
+/sbin/busybox cp res/fstab /etc/fstab

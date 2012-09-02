@@ -1,9 +1,39 @@
 #!/bin/bash
 
+rm k-ok r-ok
+
 if [ -f zImage ] && [ -f boot.img-kernel ]; then
-	rm boot.img-kernel; clear; mv zImage boot.img-kernel; clear
+	rm boot.img-kernel; mv zImage boot.img-kernel; clear
+	test boot.img-kernel && touch k-ok
 else
 	mv zImage boot.img-kernel; clear
+	test boot.img-kernel && touch k-ok
+fi
+
+if [ -f boot.img-ramdisk.cpio.gz ] || [ -f boot.img-ramdisk.cpio.gz ]; then
+	if [ -f boot.img-ramdisk.cpio.gz ] && [ -f boot.img-ramdisk.cpio.gz ]; then
+		echo "TWO RAMDISK NOT SOPPORTED!";
+		sleep 5; exit
+	fi
+	test boot.img-ramdisk.cpio.gz && echo "RAMDISK in cpio.gz	- Good!"; touch r-ok
+	test boot.img-ramdisk.cpio.lzma && echo "RAMDISK in cpio.lzma	- Good!"; touch r-ok
+else
+	if [ -d ramdisk ]; then
+		echo "CREATING RAMDISK";
+		./03-compress-ramdisk.lzma.sh
+		test boot.img-ramdisk.cpio.lzma && echo "RAMDISK	- OK"; touch r-ok
+	else
+		echo "Wont rave ramdisk files and folder!";
+		sleep 5; exit
+	fi
+fi
+
+if [ -f k-ok ] && [ -f r-ok ]; then
+	rm k-ok r-ok
+	echo "Kernel and RAMDISK - OK";
+else
+	rm k-ok r-ok
+	echo "Kernel or RAMDISK - Faill"; sleep 5; exit
 fi
 
 cd mkbootimg
@@ -33,7 +63,9 @@ if [ -f run.sh ] && [ -f md5 ]; then
 	echo 'CWM-kernel-modules.zip <-> READY'
 	echo 'PDA-boot.img.tar <-> READY'
 else
-	echo 'Error - Nothing Done!!!'
+	echo "boot.img creation - Faill"; sleep 5; exit
 fi
+
+echo "ALL DONE";
 
 sleep 5

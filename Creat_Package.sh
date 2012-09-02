@@ -1,14 +1,5 @@
 #!/bin/bash
 
-if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] || [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.lzma ]; then
-	if [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.gz ] && [ -f kernel-repack-MD5/boot.img-ramdisk.cpio.lzma ]; then
-		echo 'two ramdisk files era not supported!!!'; sleep 5; exit
-	fi
-	echo 'have ramdisk'; sleep 5
-else
-	cd kernel-repack-MD5/ && ./03-compress-ramdisk.lzma.sh; rm boot.img-kernel; cd ..
-fi
-
 if [ -d kernel-repack-MD5/CWM_kernel/system/lib/modules ]; then
 	rm -Rf kernel-repack-MD5/CWM_kernel/system/lib/modules/*
 	find ./common ./modules -name '*.ko' -exec mv -v {} kernel-repack-MD5/CWM_kernel/system/lib/modules \;
