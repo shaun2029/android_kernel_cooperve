@@ -10,6 +10,12 @@ cd common
 
 make mrproper && make bcm21553_cooperve_defconfig && make xconfig
 
+if [ -f ../clean ]; then
+	rm ../clean
+	cd ..
+	exit
+fi
+
 echo "Ready to compile? Hit <Enter> to Continue or <Ctrl>+<C> to Cancel!";
 sleep 1 && read
 
