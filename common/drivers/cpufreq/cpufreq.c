@@ -647,6 +647,22 @@ static ssize_t show_scaling_setspeed(struct cpufreq_policy *policy, char *buf)
 	return policy->governor->show_setspeed(policy, buf);
 }
 
+#ifdef CONFIG_CUSTOM_VOLTAGE
+extern ssize_t customvoltage_armvolt_read(struct device * dev, struct device_attribute * attr, char * buf);
+extern ssize_t customvoltage_armvolt_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size);
+
+static ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf)
+{
+	return customvoltage_armvolt_read(NULL, NULL, buf);
+}
+
+static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, 
+		const char *buf, size_t count)
+{
+	return customvoltage_armvolt_write(NULL, NULL, buf, count);
+}
+#endif
+
 /**
  * show_scaling_driver - show the current cpufreq HW/BIOS limitation
  */
@@ -677,6 +693,10 @@ cpufreq_freq_attr_rw(scaling_max_freq);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
 
+#ifdef CONFIG_CUSTOM_VOLTAGE
+cpufreq_freq_attr_rw(UV_mV_table);
+#endif
+
 static struct attribute *default_attrs[] = {
 	&cpuinfo_min_freq.attr,
 	&cpuinfo_max_freq.attr,
@@ -689,6 +709,9 @@ static struct attribute *default_attrs[] = {
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
+#ifdef CONFIG_CUSTOM_VOLTAGE
+	&UV_mV_table.attr;
+#endif
 	NULL
 };
 
@@ -993,14 +1016,14 @@ static int cpufreq_add_dev(struct sys_device *sys_dev)
 		goto module_out;
 	}
 
-	ret = -ENOMEM;
 	policy = kzalloc(sizeof(struct cpufreq_policy), GFP_KERNEL);
-	if (!policy)
+	if (!policy) {
+		ret = -ENOMEM;
 		goto nomem_out;
-
-	if (!alloc_cpumask_var(&policy->cpus, GFP_KERNEL))
+	}
+	if (!alloc_cpumask_var(&policy->cpus, GFP_KERNEL)) {
 		goto err_free_policy;
-
+	}
 	if (!zalloc_cpumask_var(&policy->related_cpus, GFP_KERNEL))
 		goto err_free_cpumask;
 
@@ -1082,6 +1105,8 @@ err_free_cpumask:
 	free_cpumask_var(policy->cpus);
 err_free_policy:
 	kfree(policy);
+	ret = -ENOMEM;
+	goto nomem_out;
 nomem_out:
 	module_put(cpufreq_driver->owner);
 module_out:
@@ -1184,12 +1209,13 @@ static int __cpufreq_remove_dev(struct sys_device *sys_dev)
 	spin_unlock_irqrestore(&cpufreq_driver_lock, flags);
 #endif
 
+	unlock_policy_rwsem_write(cpu);
+	kobj = &data->kobj;
+	cmp = &data->kobj_unregister;
+
 	if (cpufreq_driver->target)
 		__cpufreq_governor(data, CPUFREQ_GOV_STOP);
 
-	kobj = &data->kobj;
-	cmp = &data->kobj_unregister;
-	unlock_policy_rwsem_write(cpu);
 	kobject_put(kobj);
 
 	/* we need to make sure that the underlying kobj is actually
@@ -1392,9 +1418,8 @@ out:
  */
 static int cpufreq_resume(struct sys_device *sysdev)
 {
-	int ret = 0;
-
 	int cpu = sysdev->id;
+	int ret = 0;
 	struct cpufreq_policy *cpu_policy;
 
 	dprintk("resuming cpu %u\n", cpu);

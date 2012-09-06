@@ -338,10 +338,8 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 	if (freqs.old == freqs.new)
 		return 0;
 
-	if (IS_FLOW_DBG_ENABLED) {
-		pr_info("%s: cpu freq change: %u --> %u\n", __func__, freqs.old,
-			freqs.new);
-	}
+	pr_info("%s: cpu freq change: %u --> %u\n", __func__, freqs.old,
+		freqs.new);
 
 	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
 	local_irq_disable();
@@ -359,10 +357,8 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 		int volt_old = bcm_get_cpuvoltage(cpu, freqs.old / 1000);
 
 		if (volt_new != volt_old) {
-			if (IS_FLOW_DBG_ENABLED) {
-				pr_info("%s: cpu volt change: %d --> %d\n", __func__,
-					volt_old, volt_new);
-			}
+			pr_info("%s: cpu volt change: %d --> %d\n", __func__,
+				volt_old, volt_new);
 			regulator_set_voltage(b->cpu_regulator, volt_new,
 				volt_new);
 		}
@@ -400,10 +396,8 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 		int volt_old = bcm_get_cpuvoltage(cpu, freqs.old / 1000);
 
 		if (volt_new != volt_old) {
-			if (IS_FLOW_DBG_ENABLED) {
-				pr_info("%s: cpu volt change: %d --> %d\n", __func__,
-					volt_old, volt_new);
-			}
+			pr_info("%s: cpu volt change: %d --> %d\n", __func__,
+				volt_old, volt_new);
 			regulator_set_voltage(b->cpu_regulator, volt_new,
 				volt_new);
 		}
@@ -457,7 +451,7 @@ static int bcm_cpufreq_init(struct cpufreq_policy *policy)
 	/* Set default policy and cpuinfo */
 	policy->cur = bcm_cpufreq_get_speed(0);
 	/* FIXME: Tune this value */
-	policy->cpuinfo.transition_latency = 10000000; //CPUFREQ_ETERNAL
+	policy->cpuinfo.transition_latency = 10000000;
 
 	ret = bcm_create_cpufreqs_table(policy, &(b->bcm_freqs_table));
 	if (ret) {
