@@ -151,6 +151,7 @@
 #include <linux/usb/android.h>
 #endif
 
+#define FREQ_MHZ(ghz)		((ghz)*1000UL*1000UL*1000UL)
 #define FREQ_MHZ(mhz)		((mhz)*1000UL*1000UL)
 #define FREQ_KHZ(khz)		((khz)*1000UL)
 

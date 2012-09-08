@@ -549,12 +549,12 @@ struct platform_device bcm215xx_lcdc_device = {
 };
 #endif
 
-#define BCM_CORE_CLK_LOLO	(208U*1000)
-#define BCM_CORE_CLK_LOHI	BCM21553_CORECLK_KHZ_312
-#define BCM_CORE_CLK_NORMAL	(624U*1000)
-#define BCM_CORE_CLK_HILO	BCM21553_CORECLK_KHZ_832
-#define BCM_CORE_CLK_HIHI	(936U*1000)
-#define BCM_CORE_CLK_TURBO	(1248U*1000)
+#define BCM_CORE_CLK_SLOW	BCM21553_CORECLK_KHZ_208
+#define BCM_CORE_CLK_NORMAL	BCM21553_CORECLK_KHZ_312
+#define BCM_CORE_CLK_HILO	BCM21553_CORECLK_KHZ_624
+#define BCM_CORE_CLK_HIHI	BCM21553_CORECLK_KHZ_832
+#define BCM_CORE_CLK_TURBO	BCM21553_CORECLK_KHZ_936
+#define BCM_CORE_CLK_NITRO	BCM21553_CORECLK_KHZ_1248
 
 #if defined(CONFIG_BCM_CPU_FREQ)
 /*********************************************************************
@@ -563,22 +563,22 @@ struct platform_device bcm215xx_lcdc_device = {
 
 /* Indices for the voltage to frequency mapping table */
 enum {
-	BCM_LOLO_MODE,
-	BCM_LOHI_MODE,
+	BCM_SLOW_MODE,
 	BCM_NORMAL_MODE,
- 	BCM_HILO_MODE,
-	BCM_HIHI_MODE,
- 	BCM_TURBO_MODE,
+	BCM_HILO_MODE,
+ 	BCM_HIHI_MODE,
+	BCM_TURBO_MODE,
+ 	BCM_NITRO_MODE,
 };
 
 /* Voltage-Frequency mapping for BCM21553 CPU0 */
 static struct bcm_freq_tbl bcm215xx_cpu0_freq_tbl[] = {
-	FTBL_INIT(BCM_CORE_CLK_LOLO / 1000, 1200000),
-	FTBL_INIT(BCM_CORE_CLK_LOHI / 1000, 12400000),
-	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1260000),
-	FTBL_INIT(BCM_CORE_CLK_HILO / 1000, 1300000),
-	FTBL_INIT(BCM_CORE_CLK_HIHI / 1000, 1340000),
-	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1360000),
+	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1200000),
+	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 12400000),
+	FTBL_INIT(BCM_CORE_CLK_HILO / 1000, 1260000),
+	FTBL_INIT(BCM_CORE_CLK_HIHI / 1000, 1300000),
+	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1340000),
+	FTBL_INIT(BCM_CORE_CLK_NITRO / 1000, 1360000),
 };
 /* BCM21553 CPU info */
 static struct bcm_cpu_info bcm215xx_cpu_info[] = {
@@ -703,17 +703,17 @@ static void bcm215xx_avs_notify(int silicon_type)
 	}
 
 	{
-		bcm215xx_cpu0_freq_tbl[BCM_LOLO_MODE].cpu_voltage =
+		bcm215xx_cpu0_freq_tbl[BCM_SLOW_MODE].cpu_voltage =
 			1200000;
-		bcm215xx_cpu0_freq_tbl[BCM_LOHI_MODE].cpu_voltage =
-			1240000;
 		bcm215xx_cpu0_freq_tbl[BCM_NORMAL_MODE].cpu_voltage =
-			1260000;
+			1240000;
 		bcm215xx_cpu0_freq_tbl[BCM_HILO_MODE].cpu_voltage =
-			1300000;
+			1260000;
 		bcm215xx_cpu0_freq_tbl[BCM_HIHI_MODE].cpu_voltage =
-			1340000;
+			1300000;
 		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
+			1340000;
+		bcm215xx_cpu0_freq_tbl[BCM_NITRO_MODE].cpu_voltage =
 			1360000;
 	}
 

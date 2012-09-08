@@ -20,13 +20,21 @@
  * expects the frequency value to be in kHz.
  */
 enum {
+	BCM21553_CORECLK_KHZ_208 = (208U * 1000),
 	BCM21553_CORECLK_KHZ_312 = (312U * 1000),
+	BCM21553_CORECLK_KHZ_624 = (624U * 1000),
 	BCM21553_CORECLK_KHZ_832 = (832U * 1000),
+	BCM21553_CORECLK_KHZ_936 = (936U * 1000),
+	BCM21553_CORECLK_KHZ_1248 = (1248U * 1000),
 };
 
 struct bcm21553_cpufreq_gov_plat {
+	unsigned int freq_nitro;
 	unsigned int freq_turbo;
+	unsigned int freq_hihi;
+	unsigned int freq_hilo;
 	unsigned int freq_normal;
+	unsigned int freq_slow;
 };
 
 /* helper for cpufreq_bcm_client_get */
