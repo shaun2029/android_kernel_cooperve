@@ -598,10 +598,10 @@ int bcm21553_arm11_set_rate(struct clk *clk, unsigned long val)
 
 	arm11_freq[0] = (apps_pll_freq*2)/12;	//208Mhz SLOW
 	arm11_freq[1] = (apps_pll_freq*2)/8;	//312Mhz NORMAL
-	arm11_freq[2] = (apps_pll_freq*2)/4;	//624Mhz HILO
-	arm11_freq[3] = (apps_pll_freq*2)/3;	//832Mhz HIHI
-	arm11_freq[4] = (apps_pll_freq*3)/4;	//936Mhz TURBO
-	arm11_freq[5] = (apps_pll_freq);	//1248Mhz NITRO
+	arm11_freq[2] = (apps_pll_freq*2)/4;	//624Mhz FAST
+	arm11_freq[3] = (apps_pll_freq*2)/3;	//832Mhz TURBO
+	arm11_freq[4] = (apps_pll_freq*3)/4;	//936Mhz NITRO
+	arm11_freq[5] = (apps_pll_freq);	//1248Mhz SUPER
 
 	/*we support only modes from 0x0A ~ 0x0F*/
 	if (val == arm11_freq[0])

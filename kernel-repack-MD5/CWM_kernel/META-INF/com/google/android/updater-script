@@ -9,7 +9,10 @@ assert(getprop("ro.product.device") == "GT-S5830c" ||
        getprop("ro.product.device") == "GT-S5830m" ||
        getprop("ro.build.product") == "GT-S5830m" ||
        getprop("ro.product.device") == "GT-S5830M" ||
-       getprop("ro.build.product") == "GT-S5830M");
+       getprop("ro.build.product") == "GT-S5830M" ||
+       getprop("ro.product.device") == "GT-S5839i" ||
+       getprop("ro.build.product") == "GT-S5839i");
+
 ui_print("Install Files");
 mount("MTD", "system", "/system");
 package_extract_dir("system", "/system");
