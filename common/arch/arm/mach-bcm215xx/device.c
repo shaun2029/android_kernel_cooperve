@@ -549,12 +549,10 @@ struct platform_device bcm215xx_lcdc_device = {
 };
 #endif
 
-#define BCM_CORE_CLK_SLOW	(208U*1000)
+#define BCM_CORE_CLK_SLOW	BCM21553_CORECLK_KHZ_156
 #define BCM_CORE_CLK_NORMAL	BCM21553_CORECLK_KHZ_312
-#define BCM_CORE_CLK_FAST	(624U*1000)
+#define BCM_CORE_CLK_FAST	BCM21553_CORECLK_KHZ_624
 #define BCM_CORE_CLK_TURBO	BCM21553_CORECLK_KHZ_832
-#define BCM_CORE_CLK_NITRO	(936U*1000)
-#define BCM_CORE_CLK_SUPER	(1248U*1000)
 
 #if defined(CONFIG_BCM_CPU_FREQ)
 /*********************************************************************
@@ -567,18 +565,14 @@ enum {
 	BCM_NORMAL_MODE,
 	BCM_FAST_MODE,
  	BCM_TURBO_MODE,
-	BCM_NITRO_MODE,
- 	BCM_SUPER_MODE,
 };
 
 /* Voltage-Frequency mapping for BCM21553 CPU0 */
 static struct bcm_freq_tbl bcm215xx_cpu0_freq_tbl[] = {
 	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1200000),
 	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1240000),
-	FTBL_INIT(BCM_CORE_CLK_FAST / 1000, 1260000),
-	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1300000),
-	FTBL_INIT(BCM_CORE_CLK_NITRO / 1000, 1340000),
-	FTBL_INIT(BCM_CORE_CLK_SUPER / 1000, 1360000),
+	FTBL_INIT(BCM_CORE_CLK_FAST / 1000, 1340000),
+	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1360000),
 };
 /* BCM21553 CPU info */
 static struct bcm_cpu_info bcm215xx_cpu_info[] = {
@@ -614,7 +608,9 @@ struct platform_device bcm21553_cpufreq_drv = {
 
 static struct bcm21553_cpufreq_gov_plat bcm21553_cpufreq_gov_plat = {
 	.freq_turbo = BCM_CORE_CLK_TURBO,
+	.freq_fast = BCM_CORE_CLK_FAST,
 	.freq_normal = BCM_CORE_CLK_NORMAL,
+	.freq_slow = BCM_CORE_CLK_SLOW,
 };
 
 struct platform_device bcm21553_cpufreq_gov = {
@@ -708,12 +704,8 @@ static void bcm215xx_avs_notify(int silicon_type)
 		bcm215xx_cpu0_freq_tbl[BCM_NORMAL_MODE].cpu_voltage =
 			1240000;
 		bcm215xx_cpu0_freq_tbl[BCM_FAST_MODE].cpu_voltage =
-			1260000;
-		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
-			1300000;
-		bcm215xx_cpu0_freq_tbl[BCM_NITRO_MODE].cpu_voltage =
 			1340000;
-		bcm215xx_cpu0_freq_tbl[BCM_SUPER_MODE].cpu_voltage =
+		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
 			1360000;
 	}
 
