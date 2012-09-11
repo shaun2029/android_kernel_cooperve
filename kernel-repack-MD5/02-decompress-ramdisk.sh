@@ -7,7 +7,7 @@ else
 		echo 'Please!!! two ramdisk files are not extracted!!!'
 		echo 'hit <Enter> to close!!!'; read; exit
 	else
-		if [ -f boot.img-ramdisk.cpio.gz ] || [ -f boot.img-ramdisk.cpio.gz ]; then
+		if [ -f boot.img-ramdisk.cpio.gz ] || [ -f boot.img-ramdisk.cpio.lzma ]; then
 			if [ -f boot.img-ramdisk.cpio.gz ]; then
 				mkdir ramdisk && cd ramdisk && gzip -dc ../boot.img-ramdisk.cpio.gz | cpio -i; strings fsr.ko | grep vermagic; cd ..
 				rm boot.img-ramdisk.cpio.gz
