@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PATH=$PATH:/home/rafael/buildroot-2012.05/output/host/usr/bin
+export PATH=$PATH:$PWD/host/usr/bin
 export CROSS_COMPILE=arm-linux-
 export CC=arm-linux-gcc
 export CXX=arm-linux-g++
