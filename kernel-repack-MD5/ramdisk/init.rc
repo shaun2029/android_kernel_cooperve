@@ -182,8 +182,12 @@ on fs
     mount rfs /dev/stl9 /system ro remount
 #   mount rfs /dev/stl11 /data nosuid nodev check=no
     mount rfs /dev/stl10 /cache nosuid nodev
+
 #J4FS module
     insmod j4fs.ko
+
+#BRCM_headset
+    insmod /system/lib/modules/brcm-headsetsw.ko
 
     mount j4fs /dev/stl6 /mnt/.lfs 
 #/*ASW3 YONG_ODE_START*/
@@ -744,7 +748,7 @@ service mtvmfservice /system/bin/mtvmfservice
     user system
     group system graphics
 
-service bootanim /system/bin/bootanimation
+service bootanimation /system/bin/bootanimation
     user graphics
     group graphics
     disabled
