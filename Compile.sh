@@ -23,6 +23,4 @@ fi
 echo "Ready to compile? Hit <Enter> to Continue or <Ctrl>+<C> to Cancel!";
 sleep 1 && read
 
-echo "2.6.35.7" > include/config/kernel.release #solve ramdisk samsung modules vermagic
-
 make CONFIG_DEBUG_SECTION_MISMATCH=y -j`grep processor /proc/cpuinfo | wc -l`
