@@ -129,6 +129,12 @@ config CPU_FREQ_DEFAULT_GOV_BCM21553
 	  governor adjusts the cpu frequency and voltage based on certain
 	  usecases.
 
+config CPU_FREQ_DEFAULT_GOV_SMARTASS2
+	bool "smartass2"
+	select CPU_FREQ_GOV_SMARTASS2
+	help
+	  Use the CPUFreq governor 'smartassV2' as default.
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -220,6 +226,14 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  For details, take a look at linux/Documentation/cpu-freq.
 
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartassV2' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'smartassV2' - a "smart" optimized governor for the BCM21553!
+	
 	  If in doubt, say N.
 
 endif	# CPU_FREQ
