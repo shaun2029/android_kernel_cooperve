@@ -186,7 +186,7 @@ CAM_Sensor_Supported_Params_t CamPrimaryDefault_st =
 	  **********************************************/
 	1, // number of Thumbnail resolutions supported .      //temp_denis
 	{
-		{640 ,480} //Thumbnail/preview resolutions    //temp_denis
+		{640,480}, //Thumbnail/preview resolutions    //temp_denis
 	},
 
 	1,  //Number of Thumbnail formats supported          //temp_denis
@@ -198,7 +198,7 @@ CAM_Sensor_Supported_Params_t CamPrimaryDefault_st =
 	 *************************************************/
 	1,   //Number of video or preview mode the sensor can support
 	{
-		{640,480}  //What kind of resolution sensor can support for video resolution
+		{640,480},  //What kind of resolution sensor can support for video resolution
 	}, 
 	1, //Number of output format for preview/video mode
 	{CamDataFmtYCbCr},  //output format for preview/video mode
@@ -208,7 +208,7 @@ CAM_Sensor_Supported_Params_t CamPrimaryDefault_st =
 	  zoom support by sensor 
 	  *****************************************/
 	27, //Number of zoom steps sensor can support 
-	{CamZoom_1_25_0,CamZoom_1_25_1,CamZoom_1_25_2,	CamZoom_1_25_3,	CamZoom_1_25_4,	CamZoom_1_25_5,	CamZoom_1_25_6,	CamZoom_1_25_7,	CamZoom_1_25_8,	CamZoom_1_6_0,	CamZoom_1_6_1,	CamZoom_1_6_2,	CamZoom_1_6_3,	CamZoom_1_6_4,	CamZoom_1_6_5,	CamZoom_1_6_6,	CamZoom_1_6_7,	CamZoom_1_6_8,	CamZoom_2_0_0,	CamZoom_2_0_1,	CamZoom_2_0_2,	CamZoom_2_0_3,	CamZoom_2_0_4,	CamZoom_2_0_5,	CamZoom_2_0_6,	CamZoom_2_0_7,	CamZoom_2_0_8,}, // zoom steps	
+	{CamZoom_1_25_0, CamZoom_1_25_1, CamZoom_1_25_2, CamZoom_1_25_3, CamZoom_1_25_4, CamZoom_1_25_5, CamZoom_1_25_6, CamZoom_1_25_7, CamZoom_1_25_8, CamZoom_1_6_0, CamZoom_1_6_1, CamZoom_1_6_2, CamZoom_1_6_3, CamZoom_1_6_4, CamZoom_1_6_5, CamZoom_1_6_6, CamZoom_1_6_7, CamZoom_1_6_8, CamZoom_2_0_0, CamZoom_2_0_1, CamZoom_2_0_2, CamZoom_2_0_3, CamZoom_2_0_4, CamZoom_2_0_5, CamZoom_2_0_6, CamZoom_2_0_7, CamZoom_2_0_8,}, // zoom steps	
 	
 	"SAMSUNG",
 	"COOPERVE" ,//target name
