@@ -643,7 +643,9 @@ on boot
 
 ## for datarouter
 #    chown system system /dev/ttygs0
-#    chown system system /dev/dun    
+#    chown system system /dev/dun
+
+    start sysinit 
 
     class_start default
 
