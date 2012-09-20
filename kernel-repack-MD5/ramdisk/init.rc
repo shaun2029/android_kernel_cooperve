@@ -148,7 +148,6 @@ loglevel 3
     insmod rfs_glue.ko
     insmod rfs_fat.ko
 
-
     chmod 0770 /dev/stl9
     chmod 0770 /dev/stl10
     chmod 0770 /dev/stl11
@@ -182,12 +181,8 @@ on fs
     mount rfs /dev/stl9 /system ro remount
 #   mount rfs /dev/stl11 /data nosuid nodev check=no
     mount rfs /dev/stl10 /cache nosuid nodev
-
 #J4FS module
     insmod j4fs.ko
-
-#BRCM_headset
-    insmod /system/lib/modules/brcm-headsetsw.ko
 
     mount j4fs /dev/stl6 /mnt/.lfs 
 #/*ASW3 YONG_ODE_START*/
@@ -336,20 +331,23 @@ on post-fs
     mkdir /data/app 0771 system system
     mkdir /data/property 0700 root root
 #    mkdir /data/radio 0770 radio radio
-     mkdir /data/misc/radio 0774 radio radio
+	mkdir /data/misc/radio 0775 radio system
+	chmod 0775 /data/misc/radio
 #    mkdir /data/misc/sensors 0777 system misc
 
     # create log system 
-    mkdir /data/log 0777 system system
-    chmod 0777 /data/log
+    mkdir /data/log 0775 system log
+    chown system log /data/log
+    chmod 0775 /data/log
 
     # Create directory for FOTA 
-    mkdir /data/fota 0777 system system
-    chmod 0777 /data/fota
+    mkdir /data/fota 0775 radio radio
+    chown radio radio /data/fota
+    chmod 0775 /data/fota
 
     # anr mode chage
-    mkdir /data/anr 0777 system system 
-    chmod 0777 /data/anr
+    mkdir /data/anr 0775 system system 
+    chmod 0775 /data/anr
 
     chmod 0662 /dev/log/system
     chmod 0662 /dev/log/radio
@@ -647,8 +645,6 @@ on boot
 #    chown system system /dev/ttygs0
 #    chown system system /dev/dun    
 
-    start sysinit
-
     class_start default
 
 ## for Wi-Fi
@@ -728,13 +724,13 @@ service mobex-daemon /system/bin/npsmobex
     group system inet
 
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
-    socket zygote stream 666
+    socket zygote stream 660 root system
     onrestart write /sys/android_power/request_state wake
     onrestart write /sys/power/state on
     onrestart restart media
     onrestart restart netd
 
-service sysinit /system/bin/logwrapper /system/xbin/run-parts /system/etc/init.d
+service sysinit /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d/
     disabled
     oneshot
 
@@ -743,16 +739,11 @@ service media /system/bin/mediaserver
     group system audio camera graphics inet net_bt net_bt_admin net_raw
     ioprio rt 4
 
-#lkj add for MTV renderer
-service mtvmfservice /system/bin/mtvmfservice
-    user system
-    group system graphics
-
-service bootanimation /system/bin/bootanimation
-    user graphics
-    group graphics
-    disabled
-    oneshot
+#service bootanim /system/bin/bootanimation
+#    user graphics
+#    group graphics
+#    disabled
+#    oneshot
 
 service samsungani /system/bin/samsungani
     user graphics

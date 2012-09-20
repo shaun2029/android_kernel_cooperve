@@ -1,11 +1,6 @@
 on post-fs
 
-# set cpu min max clock
-#    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 312000
-#    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 832000
-
 # permissions for system server and daemons (accelerometer & magnetic & proximity)
-    mkdir /data/misc/sensors 0777 system misc
 
     chown root system /dev/mmc328x
     chown root system /dev/ecompass_ctrl
@@ -18,9 +13,6 @@ on post-fs
     chmod 0660 /dev/bma222
     chmod 0660 /dev/proximity
     chmod 0660 /dev/i2c-6
-
-    chmod 0660 /data/misc/sensors/ecs_nvm
-    chmod 0660 /data/misc/sensors/accel_offset
 
     chown system system /sys/class/input/input0/enable
     chown system system /sys/class/input/input0/poll_delay
@@ -47,7 +39,7 @@ on boot
 	insmod /system/lib/modules/gememalloc.ko    
 	insmod /system/lib/modules/ge_drv.ko   
     insmod /system/lib/modules/brcm_switch.ko
-
+    insmod /system/lib/modules/brcm-headsetsw.ko
     chmod 0777 /dev/camera
     chown system system /sys/bcm/cache
     chmod 0771 /dev/ttyGS0
@@ -61,10 +53,10 @@ on boot
     mkdir /data/brcm/ase
     mkdir /data/brcm/ase/extras
     mkdir /data/brcm/ase/scripts
-    chmod 0777 /data/brcm
-    chmod 0777 /data/brcm/ase
-    chmod 0777 /data/brcm/ase/extras
-    chmod 0777 /data/brcm/ase/scripts
+    chmod 0775 /data/brcm
+    chmod 0775 /data/brcm/ase
+    chmod 0775 /data/brcm/ase/extras
+    chmod 0775 /data/brcm/ase/scripts
     copy /system/etc/adb.sh /data/brcm/ase/scripts/adb.sh
     copy /system/etc/rndis.sh /data/brcm/ase/scripts/rndis.sh
     copy /system/etc/logcfg.sh /data/brcm/ase/scripts/logcfg.sh
@@ -72,12 +64,12 @@ on boot
     copy /system/etc/atmode.sh /data/brcm/ase/scripts/atmode.sh
     copy /system/etc/usbconfig.sh /data/brcm/ase/scripts/usbconfig.sh
 
-    chmod 0777 /data/brcm/ase/scripts/adb.sh
-    chmod 0777 /data/brcm/ase/scripts/rndis.sh
-    chmod 0777 /data/brcm/ase/scripts/logcfg.sh
-    chmod 0777 /data/brcm/ase/scripts/modem.sh
-    chmod 0777 /data/brcm/ase/scripts/atmode.sh
-    chmod 0777 /data/brcm/ase/scripts/usbconfig.sh
+    chmod 0775 /data/brcm/ase/scripts/adb.sh
+    chmod 0775 /data/brcm/ase/scripts/rndis.sh
+    chmod 0775 /data/brcm/ase/scripts/logcfg.sh
+    chmod 0775 /data/brcm/ase/scripts/modem.sh
+    chmod 0775 /data/brcm/ase/scripts/atmode.sh
+    chmod 0775 /data/brcm/ase/scripts/usbconfig.sh
 
 # for kexec
     chmod 755 /system/bin/kexec
@@ -85,7 +77,8 @@ on boot
     chmod 0777 /data/kexec.sh
 
 #runSysCmd
-    mkdir /data/misc/utils 0777
+    mkdir /data/misc/utils 0775
+    chown system system /data/misc/utils
 
 #permisssion for cacheops
 	chmod 0666 /dev/cache-ops 
@@ -100,16 +93,16 @@ on boot
 #	chown wifi wifi /system/etc/wifi/nvram.txt
 	chown wifi wifi /system/etc/wifi/wpa_supplicant.conf
 	#wpa_supplicant control socket for android wifi.c (android private socket)
-	mkdir /data/misc/wifi 0770 wifi wifi
-	mkdir /data/misc/wifi/sockets 0777 wifi wifi
-	chmod 0777 /data/misc/wifi/sockets
-	chmod 0777 /data/misc/wifi
-	chmod 0777 /data/misc/wifi/wpa_supplicant.conf
+	mkdir /data/misc/wifi 0775 wifi wifi
+	mkdir /data/misc/wifi/sockets 0775 wifi wifi
+	chmod 0775 /data/misc/wifi/sockets
+	chmod 0775 /data/misc/wifi
+	chmod 0775 /data/misc/wifi/wpa_supplicant.conf
 	chown wifi wifi /data/misc/wifi
 	chown wifi wifi /data/misc/wifi/wpa_supplicant.conf
    	mkdir /data/misc/dhcp 0770 dhcp dhcp
    	chown dhcp dhcp /data/misc/dhcp
-	chmod 0777 /data/misc/dhcp
+	chmod 0771 /data/misc/dhcp
 
 	chmod 0777 /data/misc/wifi/wl
 	chown wifi wifi /data/misc/wifi/wl
@@ -117,6 +110,9 @@ on boot
 	chown wifi wifi /data/misc/wifi/iperf
 	chmod 0777 /data/misc/wifi/nvram.txt
 	chown wifi wifi /data/misc/wifi/nvram.txt
+	copy /system/etc/wifi/.nvmac.info /data/misc/wifi/.nvmac.info
+	chmod 0666 /data/misc/wifi/.nvmac.info
+	chown wifi wifi /data/misc/wifi/.nvmac.info
 
 	# wpa_supplicant socket (unix socket mode)
 	mkdir /data/system/wpa_supplicant 0771 wifi wifi
@@ -167,21 +163,21 @@ on boot
     chown gps system /dev/bcm_cntin
 
 #for VT config
-    mkdir /data/vt 0777
-    chmod 0777 /system/etc/vt/3g324mConfig.val
-    chmod 0777 /system/etc/vt/testplay.3gp
-    chmod 0777 /system/etc/vt/testplay.jpg
-    chmod 0777 /system/etc/vt/testplay.bmp
+    mkdir /data/vt 0775
+    chmod 0775 /system/etc/vt/3g324mConfig.val
+    chmod 0775 /system/etc/vt/testplay.3gp
+    chmod 0775 /system/etc/vt/testplay.jpg
+    chmod 0775 /system/etc/vt/testplay.bmp
     copy /system/etc/vt/3g324mConfig.val /data/vt/3g324mConfig.val
     copy /system/etc/vt/testplay.3gp /data/vt/testplay.3gp
     copy /system/etc/vt/testplay.jpg /data/vt/testplay.jpg
     copy /system/etc/vt/testplay.bmp /data/vt/testplay.bmp
-    chmod 0777 /data/vt/3g324mConfig.val
-    chmod 0777 /data/vt/testplay.3gp
-    chmod 0777 /data/vt/testplay.jpg
-    chmod 0777 /data/vt/testplay.bmp
-    chmod 0777 /mnt/sdcard/vt
-    chmod 0777 /dev/pmem_adsp
+    chmod 0775 /data/vt/3g324mConfig.val
+    chmod 0775 /data/vt/testplay.3gp
+    chmod 0775 /data/vt/testplay.jpg
+    chmod 0775 /data/vt/testplay.bmp
+    chmod 0775 /mnt/sdcard/vt
+    chmod 0775 /dev/pmem_adsp
 
     # Use misc partition for flash OTP access
     chown root radio /dev/mtd/mtd9
@@ -223,7 +219,7 @@ service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd -d -n
 #	oneshot
 
 service wpa_supplicant /system/bin/wpa_supplicant -dd -Dwext -ieth0 -c /data/misc/wifi/wpa_supplicant.conf
-	socket eth0 dgram 777 wifi wifi
+	socket eth0 dgram 775 wifi wifi
 	disabled
 	oneshot
 
