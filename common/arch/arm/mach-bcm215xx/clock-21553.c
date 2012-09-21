@@ -618,11 +618,12 @@ int bcm21553_arm11_set_rate(struct clk *clk, unsigned long val)
 	else if (val == arm11_freq[3])
 	{
 		mode = 0x0F;
-	} else
+	}
+	else
 	{
 		return -EINVAL;
 	}
-	//writel(mode, ADDR_CLKPWR_CLK_ARMAHB_MODE);
+	writel(mode, ADDR_CLKPWR_CLK_ARMAHB_MODE);
 	bcm215xx_set_armahb_mode(mode);
 	return 0;
 }
