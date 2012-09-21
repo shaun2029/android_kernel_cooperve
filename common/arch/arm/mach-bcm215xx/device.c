@@ -569,8 +569,8 @@ enum {
 
 /* Voltage-Frequency mapping for BCM21553 CPU0 */
 static struct bcm_freq_tbl bcm215xx_cpu0_freq_tbl[] = {
-	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1200000),
-	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1260000),
+	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1180000),
+	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1240000),
 	FTBL_INIT(BCM_CORE_CLK_FAST / 1000, 1300000),
 	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1360000),
 };
@@ -627,13 +627,13 @@ struct platform_device bcm21553_cpufreq_gov = {
  *                        DATA FOR AVS DRIVER                        *
  *********************************************************************/
 
-#define NM2_FF_VOLTAGE_SLOW	1160000
-#define NM2_TT_VOLTAGE_SLOW	1180000
-#define NM2_SS_VOLTAGE_SLOW	1200000
+#define NM2_FF_VOLTAGE_SLOW	1140000
+#define NM2_TT_VOLTAGE_SLOW	1160000
+#define NM2_SS_VOLTAGE_SLOW	1180000
 
-#define NM2_FF_VOLTAGE_NORMAL	1220000
-#define NM2_TT_VOLTAGE_NORMAL	1240000
-#define NM2_SS_VOLTAGE_NORMAL	1260000
+#define NM2_FF_VOLTAGE_NORMAL	1200000
+#define NM2_TT_VOLTAGE_NORMAL	1220000
+#define NM2_SS_VOLTAGE_NORMAL	1240000
 
 #define NM2_FF_VOLTAGE_FAST	1260000
 #define NM2_TT_VOLTAGE_FAST	1280000
@@ -724,9 +724,9 @@ static void bcm215xx_avs_notify(int silicon_type)
 
 	{
 		bcm215xx_cpu0_freq_tbl[BCM_SLOW_MODE].cpu_voltage =
-			1260000;
+			1180000;
 		bcm215xx_cpu0_freq_tbl[BCM_NORMAL_MODE].cpu_voltage =
-			1280000;
+			1240000;
 		bcm215xx_cpu0_freq_tbl[BCM_FAST_MODE].cpu_voltage =
 			1300000;
 		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
