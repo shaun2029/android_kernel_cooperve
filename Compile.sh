@@ -22,5 +22,5 @@ fi
 
 echo "Ready to compile? Hit <Enter> to Continue or <Ctrl>+<C> to Cancel!";
 sleep 1 && read
-
+echo $(date +%Y%m%d) > .version
 make CONFIG_DEBUG_SECTION_MISMATCH=y -j`grep processor /proc/cpuinfo | wc -l`
