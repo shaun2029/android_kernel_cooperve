@@ -1,58 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=640" />
-
-    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
-    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-
-    <script type="text/javascript" src="javascripts/modernizr.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function () {
-        $('#main_content').headsmart()
-      })
-    </script>
     <title>Kernel cooperve by RafaelBaugis</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
-
   <body>
-    <a id="forkme_banner" href="https://github.com/RafaelBaugis/Kernel-cooperve">View on GitHub</a>
-    <div class="shell">
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/RafaelBaugis/Kernel-cooperve">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/RafaelBaugis/Kernel-cooperve/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/RafaelBaugis/Kernel-cooperve/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-      <header>
-        <span class="ribbon-outer">
-          <span class="ribbon-inner">
-            <h1>Kernel cooperve</h1>
-            <h2>Samsung Galaxy ACE</h2>
-          </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
-      </header>
+    <div class="wrapper">
 
-      <section id="downloads">
-        <span class="inner">
-          <a href="https://github.com/RafaelBaugis/Kernel-cooperve/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/RafaelBaugis/Kernel-cooperve/tarball/master" class="tgz"><em>download</em> .TGZ</a>
-        </span>
-      </section>
+      <section>
+        <div id="title">
+          <h1>Kernel cooperve</h1>
+          <p>Samsung Galaxy ACE</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/RafaelBaugis">RafaelBaugis</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
 
-
-      <span class="banner-fix"></span>
-
-
-      <section id="main_content">
         <p>Model: <em>GT-S5830C-i-M</em></p>
 
 <p>CPU: <em>Broadcom 21553 ARM11</em></p>
 
 <p>Arquitecture: <em>ARM1136JF-S</em></p>
 
-<p><img src="http://forum.xda-developers.com/attachment.php?attachmentid=1317642&amp;stc=1&amp;d=1347332090" alt="Rafael.Baugis Kernel"></p>
+<p><img src="http://forum.xda-developers.com/attachment.php?attachmentid=1317642&amp;stc=1&amp;d=1347332090" alt="Rafael.Baugis Kernel"><img src="http://forum.xda-developers.com/attachment.php?attachmentid=1345503&amp;stc=1&amp;d=1348322079" alt="kernel build number"></p>
 
 <p>This Kernel version 2.6.35.7 is from Samsung sources, with GCC 4.4.7 compiled from sources, specific to arm1136jf-s.
 I changed in sources for add more frequencies to cpu and configured to add features.
@@ -63,49 +55,46 @@ The kernel can be used on any rom.</p>
 <ul>
 <li>vfat, ext2, ext3, ext4.</li>
 <li>swap, ramzswap and zRAM.</li>
-<li>
-<p>cpu freq with auto undervolt.</p>
-
-<p>156Mhz 1,18v</p>
-
-<p>312Mhz 1,24v</p>
-
-<p>624Mhz 1,30v</p>
-
-<p>832Mhz 1,36v</p>
-</li>
-<li><p>cpu auto undervolt on change cpu freq.</p></li>
-<li><p>cpu governors smartassV2, lazy, lulzactive, minmax, lagfree, lionheart, conservative, interactive, ondemand, ondemandx, userspace, powersave, bcm21553 and performance.</p></li>
-<li><p>IO schedulers noop, deadline, cfq, sio, vr and bfq.</p></li>
-<li><p>iptables full needed rules.</p></li>
-<li><p>vpn support</p></li>
-<li><p>cifs support</p></li>
-<li><p>init.d - if not work check if the su and busybox location is /system/xbin/</p></li>
-</ul><blockquote>
-<h3>How to Compile:</h3>
+<li>cpu freq with auto undervolt.
 
 <ol>
-<li>
-<h3>Install dependencies</h3>
-
-<p>$ ./install_dep.sh</p>
-</li>
-<li>
-<h3>Configure and Compile</h3>
-
-<p>$ ./Compile.sh</p>
-</li>
-<li>
-<h3>Create package</h3>
-
-<p>$ ./Creat_package.sh</p>
-</li>
+<li>156Mhz 1,18v</li>
+<li>312Mhz 1,24v</li>
+<li>624Mhz 1,30v</li>
+<li>832Mhz 1,36v</li>
 </ol>
-</blockquote>
+</li>
+<li>cpu auto undervolt on change cpu freq.</li>
+<li>cpu governors smartassV2, lazy, lulzactive, minmax, lagfree, lionheart, conservative, interactive, ondemand, ondemandx, userspace, powersave, bcm21553 and performance.</li>
+<li>IO schedulers noop, deadline, cfq, sio, vr and bfq.</li>
+<li>iptables full needed rules.</li>
+<li>vpn support</li>
+<li>cifs support</li>
+<li>init.d - if not work check if the su and busybox location is /system/xbin/</li>
+</ul><h3>How to Compile:</h3>
 
-<h3>Authors and Contributors</h3>
+<ol>
+<li>Install dependencies.
 
-<p>Rafael.Baugis@xdadevelopers</p>
+<ul>
+<li>$ ./install_dep.sh</li>
+</ul>
+</li>
+<li>Configure and Compile.
+
+<ul>
+<li>$ ./Compile.sh</li>
+</ul>
+</li>
+<li>Create package.
+
+<ul>
+<li>$ ./Creat_package.sh</li>
+</ul>
+</li>
+</ol><h3>Authors and Contributors</h3>
+
+<p>Rafael.Baugis@xdadevelopers and Rafael.Baugis@brasildroid</p>
 
 <p>vivanco@xdadevelopers</p>
 
@@ -117,23 +106,12 @@ The kernel can be used on any rom.</p>
 
 <h3>Support or Contact</h3>
 
-<p><a href="http://forum.xda-developers.com/member.php?u=3989929">http://forum.xda-developers.com/member.php?u=3989929</a></p>
+<p><a href="http://forum.xda-developers.com/member.php?u=3989929">http://forum.xda-developers.com/member.php?u=3989929</a>
+<a href="http://brasildroid.com.br/members/rafael-baugis-12625/">http://brasildroid.com.br/members/rafael-baugis-12625/</a></p>
       </section>
 
-      <footer>
-        <span class="ribbon-outer">
-          <span class="ribbon-inner">
-            <p>this project by <a href="https://github.com/RafaelBaugis">RafaelBaugis</a> can be found on <a href="https://github.com/RafaelBaugis/Kernel-cooperve">GitHub</a></p>
-          </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
-        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
-        <span class="octocat"></span>
-      </footer>
-
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
