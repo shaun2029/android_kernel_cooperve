@@ -8,17 +8,15 @@ on init
     export ANDROID_DATA /data
     export EXTERNAL_STORAGE /sdcard
 
-    symlink /system/etc /etc
-
     mkdir /sdcard
     mkdir /sd-ext
+    mkdir /etc
     mkdir /system
     mkdir /data
     mkdir /cache
     mkdir /tmp
     mkdir /dbdata
     mkdir /mnt 0775 root root
-    #mount /tmp /tmp tmpfs   
 
 on early-fs
 
@@ -67,8 +65,8 @@ service recovery /sbin/recovery
 service adbd /sbin/adbd recovery
 	disabled
 
-#on property:persist.service.adb.enable=1
-#    start adbd
+on property:persist.service.adb.enable=1
+    start adbd
 
 on property:persist.service.adb.enable=0
     stop adbd
