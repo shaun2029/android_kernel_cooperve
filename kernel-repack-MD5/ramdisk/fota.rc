@@ -11,6 +11,7 @@ on init
     symlink /system/etc /etc
 
     mkdir /sdcard
+    mkdir /sd-ext
     mkdir /system
     mkdir /data
     mkdir /cache
@@ -23,12 +24,12 @@ on init
 on early-fs
 
     # rfs drivers
-    insmod fsr.ko
-    insmod fsr_stl.ko
-    insmod rfs_glue.ko
-    insmod rfs_fat.ko
-    insmod sec_param.ko
-    insmod j4fs.ko
+    insmod /lib/modules/fsr.ko
+    insmod /lib/modules/fsr_stl.ko
+    insmod /lib/modules/rfs_glue.ko
+    insmod /lib/modules/rfs_fat.ko
+    insmod /lib/modules/sec_param.ko
+    insmod /lib/modules/j4fs.ko
 
 on fs
     mount tmpfs tmpfs /tmp

@@ -28,6 +28,7 @@ loglevel 1
 
 # create mountpoints
     mkdir /mnt 0775 root system
+    mkdir /mnt/sd-ext 0000 system system
     mkdir /mnt/sdcard 0000 system system
 
 # Create cgroup mount point for cpu accounting
@@ -36,6 +37,7 @@ loglevel 1
     mkdir /acct/uid
 
 # Backwards Compat - XXX: Going away in G*
+    symlink /mnt/sd-ext /sd-ext
     symlink /mnt/sdcard /sdcard
 
     mkdir /system
@@ -79,11 +81,11 @@ loglevel 1
     write /dev/cpuctl/bg_non_interactive/cpu.shares 52
 
 #FSR module
-    insmod fsr.ko
-    insmod fsr_stl.ko
+    insmod /lib/modules/fsr.ko
+    insmod /lib/modules/fsr_stl.ko
 #RFS module
-    insmod rfs_glue.ko
-    insmod rfs_fat.ko
+    insmod /lib/modules/rfs_glue.ko
+    insmod /lib/modules/rfs_fat.ko
 
 on fs
 # mount mtd partitions
