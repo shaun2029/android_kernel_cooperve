@@ -602,10 +602,10 @@ int bcm21553_arm11_set_rate(struct clk *clk, unsigned long val)
 	arm11_freq[3] = (apps_pll_freq*2)/3;	//832Mhz TURBO
 
 
-	/*we support only modes 0x0A 0x0C 0x0E 0x0F*/
+	/*we support only modes 0x09 0x0C 0x0E 0x0F*/
 	if (val == arm11_freq[0])
 	{
-		mode = 0x0A;
+		mode = 0x09;
 	}
 	else if (val == arm11_freq[1])
 	{
@@ -623,7 +623,7 @@ int bcm21553_arm11_set_rate(struct clk *clk, unsigned long val)
 	{
 		return -EINVAL;
 	}
-	writel(mode, ADDR_CLKPWR_CLK_ARMAHB_MODE);
+	//writel(mode, ADDR_CLKPWR_CLK_ARMAHB_MODE);
 	bcm215xx_set_armahb_mode(mode);
 	return 0;
 }
@@ -656,7 +656,7 @@ unsigned long bcm21553_ahb_get_rate(struct clk *clk)
 	else
 	{
 		apps_pll_freq = bcm21553_apps_pll_get_rate();
-		ahb = ((apps_pll_freq/9)/FREQ_MHZ(1))*FREQ_MHZ(1);
+		ahb = ((apps_pll_freq/8)/FREQ_MHZ(1))*FREQ_MHZ(1);
 	}
 
 	return ahb;
@@ -674,7 +674,7 @@ unsigned long bcm21553_ahb_fast_get_rate(struct clk *clk)
 	else
 	{
 		apps_pll_freq = bcm21553_apps_pll_get_rate();
-		ahb_fast = (mode <= 8) ? apps_pll_freq/9 : apps_pll_freq/6;
+		ahb_fast = apps_pll_freq/6;
 	}
 	ahb_fast = (ahb_fast*FREQ_MHZ(1))/FREQ_MHZ(1);
 
@@ -990,7 +990,7 @@ unsigned long bcm21553_sdram_get_rate(struct clk *clk)
 		if(mode < 0x0C)
 			sdram_clk_speed = clk_armahb_reg_to_ahb_fast_freq_mapping[mode];
 		else
-			sdram_clk_speed = (mode <= 8) ? apps_pll_freq/9 : apps_pll_freq/6;
+			sdram_clk_speed = apps_pll_freq/6;
 	}
 	else
 	{
@@ -1912,7 +1912,7 @@ brcm_clk_proc_read(char *page, char **start,
 	{
 		arm11 = (apps_pll_freq*2)/arm11_div[mode -0xD];
 		cp_clk = apps_pll_freq/cp_clk_div[mode -0xD];
-		ahb = apps_pll_freq/9;
+		ahb = apps_pll_freq/8;
 		ahb_fast = apps_pll_freq/6;
 		v3d_clk = apps_pll_freq/4;
 	}

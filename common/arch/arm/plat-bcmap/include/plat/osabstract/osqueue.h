@@ -194,17 +194,18 @@ static inline OSStatus_t OSQUEUE_Pend(				// get message from the queue
 		return status;
 	}
 
-	mutex_lock_interruptible(&queue->q_mutex);
-	temp_ptr = list_first_entry(&(queue->q_list.head), struct QueueLLI_t, head);
+	if(!(mutex_lock_interruptible(&queue->q_mutex))){
+		temp_ptr = list_first_entry(&(queue->q_list.head), struct QueueLLI_t, head);
 
-	if (msg && temp_ptr && temp_ptr->msg_ptr && queue)
-		memcpy(msg, temp_ptr->msg_ptr, queue->msg_size);
-	else
-		pr_info("Error: Node ptr=0x%p msg_ptr=0x%p\n", temp_ptr, temp_ptr->msg_ptr);
-	kfree(temp_ptr->msg_ptr);
-	list_del_init(&temp_ptr->head);
-	kfree(temp_ptr);
-	mutex_unlock(&queue->q_mutex);
+		if (msg && temp_ptr && temp_ptr->msg_ptr && queue)
+			memcpy(msg, temp_ptr->msg_ptr, queue->msg_size);
+		else
+			pr_info("Error: Node ptr=0x%p msg_ptr=0x%p\n", temp_ptr, temp_ptr->msg_ptr);
+		kfree(temp_ptr->msg_ptr);
+		list_del_init(&temp_ptr->head);
+		kfree(temp_ptr);
+		mutex_unlock(&queue->q_mutex);
+	}
 
 	return status;
 }
@@ -240,14 +241,15 @@ static inline OSStatus_t OSQUEUE_PostGeneric( 					// internal method to post ms
 					return status;
 				}
 			} else
-				mutex_lock_interruptible(&queue->q_mutex);
-			if(post_to_tail) {
-				list_add_tail(&(tmp->head), &(queue->q_list.head));
-			} else {
-				list_add(&(tmp->head), &(queue->q_list.head));
-			}
-			memcpy((QMsg_t *)tmp->msg_ptr, msg, queue->msg_size);
-			mutex_unlock(&queue->q_mutex);
+				if(!(mutex_lock_interruptible(&queue->q_mutex))){
+					if(post_to_tail) {
+						list_add_tail(&(tmp->head), &(queue->q_list.head));
+					} else {
+						list_add(&(tmp->head), &(queue->q_list.head));
+					}
+					memcpy((QMsg_t *)tmp->msg_ptr, msg, queue->msg_size);
+					mutex_unlock(&queue->q_mutex);
+				}
 			complete(&queue->msg_queued);
 			status = OSSTATUS_SUCCESS;
 		} else {

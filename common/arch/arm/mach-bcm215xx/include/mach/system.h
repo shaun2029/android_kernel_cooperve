@@ -40,6 +40,7 @@ static inline void arch_idle(void)
 #define REBOOT_MODE_RECOVERY	4
 #define REBOOT_MODE_ARM11_FOTA	5
 #define REBOOT_MODE_CPREBOOT	6
+#define REBOOT_MODE_RECOVERY_DONE	7
 #define BCM215XXINFORM 0x28004000
 #define BCM215XXINFORM3 0x28004010
 static inline void arch_reset(char mode, const char *cmd)
@@ -64,6 +65,9 @@ static inline void arch_reset(char mode, const char *cmd)
 			       BCM215XXINFORM3);
 		else if (!strcmp(cmd, "upload"))
 			writel(REBOOT_PREFIX | REBOOT_MODE_UPLOAD,
+			       BCM215XXINFORM3);
+		else if (!strcmp(cmd, "recovery_done"))
+			writel(REBOOT_PREFIX | REBOOT_MODE_RECOVERY_DONE,
 			       BCM215XXINFORM3);
 #if defined(CONFIG_RTC_CHN_ALARM_BOOT)
 		else if (!strcmp(cmd, "alarmboot"))
