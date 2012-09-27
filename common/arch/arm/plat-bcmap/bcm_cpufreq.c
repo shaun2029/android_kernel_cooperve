@@ -351,7 +351,7 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
 	local_irq_disable();
 
-	/* g
+	/*
 	 * needs special handling.
 	 */
 	index_turbo = info->index_turbo;
@@ -362,10 +362,8 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 	volt_new = bcm_get_cpuvoltage(cpu, freqs.new / 1000);
 	volt_old = bcm_get_cpuvoltage(cpu, freqs.old / 1000);
 	if (volt_new > volt_old) {
-		pr_info("%s: cpu volt change: %d --> %d\n", __func__,
-				volt_old, volt_new);
-		regulator_set_voltage(b->cpu_regulator, volt_new,
-							  volt_new);
+		regulator_set_voltage(b->cpu_regulator, 1340000,
+							  1340000);
 	}
 	if (freqs.new == freq_turbo) {
 		clk_enable(b->appspll_en_clk);
@@ -379,7 +377,10 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 	if ((ret = 0) || (!ret)) {
 		ret = clk_set_rate(b->cpu_clk, freqs.new * 1000);
 	}
-	if (volt_new < volt_old) {
+	if (volt_new != volt_old) {
+		if (volt_new > volt_old) {
+			mdelay(1);
+		}
 		pr_info("%s: cpu volt change: %d --> %d\n", __func__,
 			volt_old, volt_new);
 		regulator_set_voltage(b->cpu_regulator, volt_new,
