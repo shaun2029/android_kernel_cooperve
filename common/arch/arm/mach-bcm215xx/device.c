@@ -569,10 +569,10 @@ enum {
 
 /* Voltage-Frequency mapping for BCM21553 CPU0 */
 static struct bcm_freq_tbl bcm215xx_cpu0_freq_tbl[] = {
-	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1180000),
-	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1240000),
-	FTBL_INIT(BCM_CORE_CLK_FAST / 1000, 1300000),
-	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1360000),
+	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1160000),
+	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1220000),
+	FTBL_INIT(BCM_CORE_CLK_FAST / 1000, 1280000),
+	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1340000),
 };
 /* BCM21553 CPU info */
 static struct bcm_cpu_info bcm215xx_cpu_info[] = {
@@ -724,13 +724,13 @@ static void bcm215xx_avs_notify(int silicon_type)
 
 	{
 		bcm215xx_cpu0_freq_tbl[BCM_SLOW_MODE].cpu_voltage =
-			1180000;
+			1160000;
 		bcm215xx_cpu0_freq_tbl[BCM_NORMAL_MODE].cpu_voltage =
-			1240000;
+			1220000;
 		bcm215xx_cpu0_freq_tbl[BCM_FAST_MODE].cpu_voltage =
-			1300000;
+			1280000;
 		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
-			1360000;
+			1340000;
 	}
 
 }
@@ -802,9 +802,9 @@ void __init update_avs_sysparm(void)
 	SYSPARM_VOLT("nm2_tt_voltage_normal", part_type_tt.nm2_normal_voltage);
 	SYSPARM_VOLT("nm2_ss_voltage_normal", part_type_ss.nm2_normal_voltage);
 
-	SYSPARM_VOLT("nm2_ff_slow_normal", part_type_ff.nm2_slow_voltage);
-	SYSPARM_VOLT("nm2_tt_slow_normal", part_type_tt.nm2_slow_voltage);
-	SYSPARM_VOLT("nm2_ss_slow_normal", part_type_ss.nm2_slow_voltage);
+	SYSPARM_VOLT("nm2_ff_voltage_slow", part_type_ff.nm2_slow_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_slow", part_type_tt.nm2_slow_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_slow", part_type_ss.nm2_slow_voltage);
 
 	SYSPARM_VOLT("nm_ff_voltage", part_type_ff.nm_voltage);
 	SYSPARM_VOLT("nm_tt_voltage", part_type_tt.nm_voltage);
