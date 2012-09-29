@@ -19,6 +19,13 @@ fi
 
 mv ./common/arch/arm/boot/zImage ./kernel-repack-MD5/zImage
 
+if [ -f kernel-repack-MD5/CWM_kernel/system/lib/modules/j4fs.ko ]; then
+	rm kernel-repack-MD5/ramdisk/lib/modules/j4fs.ko
+	mv kernel-repack-MD5/CWM_kernel/system/lib/modules/j4fs.ko kernel-repack-MD5/ramdisk/lib/modules/
+fi
+
+chmod 644 kernel-repack-MD5/ramdisk/lib/modules/*.ko
+
 if [ -f ./kernel-repack-MD5/zImage ] && [ "$(find ./kernel-repack-MD5/CWM_kernel/system/lib/modules/ -name *.ko)" ]; then
 	cd kernel-repack-MD5 && ./04-creat-package.sh && cd ..
 else
