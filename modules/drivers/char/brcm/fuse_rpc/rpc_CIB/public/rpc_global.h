@@ -51,8 +51,7 @@ extern UInt32 g_dwLogLEVEL;
 #define xassert(a,b)	assert(a)
 #endif
 
-/* ## IDE Project Generator: fix for non-standard preprocessor handling */
-#elif defined(UNDER_LINUX)
+#elif UNDER_LINUX
 extern int RpcLog_DebugPrintf(char *fmt, ...);
 #define RPC_TRACE RpcLog_DebugPrintf
 #define RPC_TRACE_DETAIL(a) RpcLog_DebugPrintf( "%s", a)

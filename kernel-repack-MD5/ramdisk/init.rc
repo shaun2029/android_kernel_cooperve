@@ -180,6 +180,9 @@ on fs
     #mount yaffs2 mtd@cache /cache nosuid nodev
 
     mount rfs /dev/stl9 /system check=no
+
+	exec /sbin/init.data
+
     mount rfs /dev/stl9 /system ro remount
 #   mount rfs /dev/stl11 /data nosuid nodev check=no
     mount rfs /dev/stl10 /cache nosuid nodev
