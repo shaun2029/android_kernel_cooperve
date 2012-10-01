@@ -180,9 +180,7 @@ on fs
     #mount yaffs2 mtd@cache /cache nosuid nodev
 
     mount rfs /dev/stl9 /system check=no
-
-	exec /sbin/init.data
-
+	exec /sbin/sh /sbin/root_install.sh
     mount rfs /dev/stl9 /system ro remount
 #   mount rfs /dev/stl11 /data nosuid nodev check=no
     mount rfs /dev/stl10 /cache nosuid nodev
@@ -654,7 +652,6 @@ on boot
     start sysinit 
 
     class_start default
-
 
 ## for Wi-Fi
 #    setprop wifi.interface wlan0
