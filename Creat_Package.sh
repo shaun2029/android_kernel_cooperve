@@ -24,6 +24,11 @@ if [ -f kernel-repack-MD5/CWM_kernel/system/lib/modules/j4fs.ko ]; then
 	mv kernel-repack-MD5/CWM_kernel/system/lib/modules/j4fs.ko kernel-repack-MD5/ramdisk/lib/modules/
 fi
 
+if [ -f kernel-repack-MD5/CWM_kernel/system/lib/modules/sec_param.ko ]; then
+	rm kernel-repack-MD5/ramdisk/lib/modules/sec_param.ko
+	mv kernel-repack-MD5/CWM_kernel/system/lib/modules/sec_param.ko kernel-repack-MD5/ramdisk/lib/modules/
+fi
+
 chmod 644 kernel-repack-MD5/ramdisk/lib/modules/*.ko
 
 if [ -f ./kernel-repack-MD5/zImage ] && [ "$(find ./kernel-repack-MD5/CWM_kernel/system/lib/modules/ -name *.ko)" ]; then

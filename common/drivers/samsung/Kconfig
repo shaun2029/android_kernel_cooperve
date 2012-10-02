@@ -16,6 +16,13 @@ menuconfig J4FS
 	help
 	  Say Y to enable Samsung J4FS support.
 
+menuconfig PARAM
+	tristate "Samsung PARAM support"
+	depends on SAMSUNG_MODULES
+	default m
+	help
+	  Say Y to enable Samsung PARAM support.
+
 menuconfig VIBETONZ
 	tristate "Vibetonz"
 	depends on SAMSUNG_MODULES
