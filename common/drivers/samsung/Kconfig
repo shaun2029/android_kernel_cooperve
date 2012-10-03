@@ -29,3 +29,17 @@ menuconfig VIBETONZ
 	default m
 	help
 	  Say Y to enable Vibetonz support.
+
+menuconfig STORAGE
+        tristate "Storage"
+        depends on SAMSUNG_MODULES && SAMSUNG_PHONE_SVNET
+        default m
+        help
+          Say Y to enable DGS info support.
+
+menuconfig LEVEL
+        tristate "Level"
+        depends on SAMSUNG_MODULES && SAMSUNG_PHONE_SVNET
+        default m
+        help
+          Say Y to enable Debug Level support.

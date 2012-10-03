@@ -88,7 +88,7 @@ enum	AACEncIoctrlCode
 	AACEncIoctrl_GetStatus,
 	AACEncIoctrl_GetVersion,
 	AACEncIoctrl_SETEOS
-
+		
 };
 
 
@@ -134,10 +134,10 @@ typedef	struct _TBrcmAACEnc
 	volatile UInt16  * pDoneFlag;
 	volatile UInt16  * pInSrc;	//input source: 0ARM 1: MIC
 	volatile Shared_poly_audio_t  *pg4_sm;
-
+	
 	TBrcmAACEncParms	mParms;
 	struct fasync_struct *pfasync;
-
+	
 	UInt32	u32Flags;
 	UInt32	u32WrLen; //debug
 	UInt32	u32TotalFrames;
@@ -246,7 +246,7 @@ void	DspCodecMsgHandler(StatQ_t *pstatus_msg)
 			spin_unlock(&pAacEnc->spinlock_aac);
 			kill_fasync(&pAacEnc->pfasync, SIGIO, POLL_IN);
 			break;
-
+			
 		case STATUS_PRAM_CODEC_OUTPUT_FULL:
 			spin_lock(&pAacEnc->spinlock_aac);
 			pAacEnc->u32Flags |= AACEnc_MASK_CODEC_OUTFULL;
@@ -265,7 +265,7 @@ void	DspCodecMsgHandler(StatQ_t *pstatus_msg)
 			pAacEnc->u32Flags |= AACEnc_MASK_CODEC_DONE;
 			spin_unlock(&pAacEnc->spinlock_aac);
 			kill_fasync(&pAacEnc->pfasync, SIGIO, POLL_IN);
-
+			
 			break;
 		case STATUS_PRAM_CODEC_CANCELPLAY:
 			//cancel processing
@@ -296,7 +296,7 @@ static ssize_t brcm_aacenc_read(struct file * file, char __user *_buf,
 
 	UInt32	size;
 	TBrcmAACEnc	*pAacEnc = (TBrcmAACEnc	*)file->private_data;
-
+	
 //	DEBUG("brcm_aacenc_read: user buf=0x%x count =%d\n", (unsigned int)_buf, (int)count);
 	spin_lock(&pAacEnc->spinlock_aac);
 	size = CBufRead(&pAacEnc->mCirbufIn, _buf, count);
@@ -320,7 +320,7 @@ static ssize_t brcm_aacenc_write(struct file * file, const char __user *_buf,
 {
 	TBrcmAACEnc	*pAacEnc = (TBrcmAACEnc	*)file->private_data;
 	UInt32	size;
-
+	
 //	DEBUG("brcm_aacenc_write: user buf=0x%x count =%d\n", (unsigned int)_buf, (int)count);
 	spin_lock(&pAacEnc->spinlock_aac);
 	size = CBufWrite(&pAacEnc->mCirbufOut, _buf, count);
@@ -367,7 +367,7 @@ static int	ConfigOutChannel(TBrcmAACEnc	*pAacEnc)
 	pAacEnc->pInSrc	= &pg0_sm->shared_AACEnc_PCM_SOURCE;
 	CBufReset(&pAacEnc->mCirbufOut);
 	pAacEnc->pg4_sm = SHAREDMEM_GetPage4SharedMemPtr();
-
+	
 	return 0;
 }
 
@@ -415,7 +415,7 @@ static int brcm_aacenc_open(struct inode *inode, struct file * file)
 	pAacEnc->u32Flags |= AACEnc_MASK_CODEC_OPENED|AACEnc_MASK_CODEC_INEMPTY;
 
 	file->private_data = pAacEnc;
-
+		
 	DEBUG("brcm_aacenc_open pAacEnc %x \n", (unsigned int)file->private_data);
 
 	//Config Input/Output channel
@@ -441,7 +441,7 @@ static int brcm_aacenc_release(struct inode *inode, struct file * file)
 
 	DEBUG("brcm_aacenc_release total write length=0x%x, totalframes=%d\n", pAacEnc->u32WrLen, pAacEnc->u32TotalFrames);
 	memset(pAacEnc, 0, sizeof(TBrcmAACEnc));
-
+	
 	return err;
 }
 
@@ -456,7 +456,7 @@ static int brcm_aacenc_release(struct inode *inode, struct file * file)
 static	int	GetParms(struct file * file, TBrcmAACEncParms __user * _pa)
 {
 	TBrcmAACEnc	*pAacEnc = (TBrcmAACEnc	*)file->private_data;
-
+	
 	if (0 != copy_to_user(_pa, &pAacEnc->mParms, sizeof(TBrcmAACEncParms)))
 		return -EFAULT;
 	return 0;
@@ -476,7 +476,7 @@ static	int	SetParms(struct file * file, TBrcmAACEncParms __user *_pa)
 	int err;
 	//Get data from user space
 	err = copy_from_user(pParms, _pa,  sizeof(TBrcmAACEncParms));
-
+	
 	if (!err)
 	{
 		//set to hardware
@@ -501,7 +501,7 @@ static	int	SetParms(struct file * file, TBrcmAACEncParms __user *_pa)
 				pAacEnc->pg4_sm->shared_Outbuf_Freq_Sts_TH
 				);
 
-
+		
 
 	}
 	return err;
@@ -520,7 +520,7 @@ static	int	LoadCodecImage(struct file * file, TDspCodecImage __user *_pa)
 	TBrcmAACEnc	*pAacEnc = (TBrcmAACEnc	*)file->private_data;
 	UInt8 *codec_image;	// defined in audvoc_codec.c. Come back to see what is it later....
 
-
+	
 	if ( copy_from_user(&img, _pa,  sizeof(TDspCodecImage)) )
 	{
 		PDEBUG("Can not copy_from_user TDspCodecImage %d\n", img.length);
@@ -538,7 +538,7 @@ static	int	LoadCodecImage(struct file * file, TDspCodecImage __user *_pa)
 		PDEBUG("Can not copy_from_user codec image %d\n", img.length);
 		return -EFAULT;
 	}
-
+	
 	AUDVOC_AACENC_downloadCodec(pAacEnc, codec_image, img.length);
 
 	{
@@ -558,7 +558,7 @@ static	int	LoadCodecImage(struct file * file, TDspCodecImage __user *_pa)
 	}
 
 	kfree(codec_image);
-
+	
 	return -2;
 }
 
@@ -640,7 +640,7 @@ static long brcm_aacenc_ioctl(struct file * file, unsigned int cmd,
 			break;
 		case AACEncIoctrl_Stop:
 			break;
-
+			
 		case AACEncIoctrl_Pause:
 			break;
 		case AACEncIoctrl_SetParms:
@@ -650,7 +650,7 @@ static long brcm_aacenc_ioctl(struct file * file, unsigned int cmd,
 			GetParms(file, argp);			
 			break;
 
-
+	
 		case AACEncIoctrl_SetOutPutParm:
 			break;
 
@@ -659,7 +659,7 @@ static long brcm_aacenc_ioctl(struct file * file, unsigned int cmd,
 		case AACEncIoctrl_GetStatus:
 			GetEncStatus(file, argp);
 			break;
-
+			
 		case AACEncIoctrl_LoadCodecImage:
 			LoadCodecImage(file, argp);
 			break;
@@ -785,7 +785,7 @@ int AUDVOC_AACENC_downloadCodec (TBrcmAACEnc *pAacEnc, UInt8 *pImgBuf, int lengt
 	UInt16 addrH, addrL, len;	// information sent to DSP command message
 	UInt32 aacenc_addr;
 
-
+	
 	// Copied from dsp_test.c. but WHY???
 	// The first part of codec image is the program to download the real codec image. 
 	// So we download it to DSP first, and then DSP will run this program and finish the download.
@@ -801,10 +801,11 @@ int AUDVOC_AACENC_downloadCodec (TBrcmAACEnc *pAacEnc, UInt8 *pImgBuf, int lengt
 
 	//	Load AAC Encoder to DSP
 	post_msg(COMMAND_START_PRAM_FUNCT, addrH, addrL, len);
-
+	
 	return 0;
 }
 
 
 module_init(BrcmAACEncModuleInit);
 module_exit(BrcmAACEncModuleExit);
+

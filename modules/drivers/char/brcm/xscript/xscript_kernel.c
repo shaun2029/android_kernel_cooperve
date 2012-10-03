@@ -448,6 +448,3 @@ static void __exit XSCRIPT_KERNEL_ModuleExit(void)
 module_init(XSCRIPT_KERNEL_ModuleInit);
 module_exit(XSCRIPT_KERNEL_ModuleExit);
 
-
-
-

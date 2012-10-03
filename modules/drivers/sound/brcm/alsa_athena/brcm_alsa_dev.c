@@ -502,7 +502,7 @@ UInt32		amrMode		// AMR codec mode of speech data
         {
             if( voip_driver_handle->voip_data_ul_buf_ptr )
             {
-//                DEBUG(" VOIP_DumpUL_CB : VOIP_buf_ul_index 0x%x, \r\n", voip_driver_handle->voip_data_ul_wr_index);
+                //DEBUG(" VOIP_DumpUL_CB : VOIP_buf_ul_index 0x%x, \r\n", voip_driver_handle->voip_data_ul_wr_index);
                 memcpy(voip_driver_handle->voip_data_ul_buf_ptr + voip_driver_handle->voip_data_ul_wr_index, pSrc, VOIP_FRAME_SIZE);
                 voip_driver_handle->voip_ul_framecount++;
                 voip_driver_handle->voip_data_ul_wr_index += VOIP_FRAME_SIZE;
@@ -536,7 +536,7 @@ static Boolean VOIP_FillDL_CB(AUDIO_DRIVER_HANDLE_t drv_handle, UInt8 *pDst, UIn
             }
             if( voip_driver_handle->voip_data_dl_buf_ptr )
             {
-//                DEBUG(" VOIP_FillDL_CB : VOIP_buf_dl_index 0x%x, \r\n", voip_driver_handle->voip_data_dl_rd_index);
+                //DEBUG(" VOIP_FillDL_CB : VOIP_buf_dl_index 0x%x, \r\n", voip_driver_handle->voip_data_dl_rd_index);
                 memcpy(pDst, voip_driver_handle->voip_data_dl_buf_ptr + voip_driver_handle->voip_data_dl_rd_index, VOIP_FRAME_SIZE);
                 voip_driver_handle->voip_dl_framecount--;
                 voip_driver_handle->voip_data_dl_rd_index += VOIP_FRAME_SIZE;
@@ -798,6 +798,10 @@ static UInt32 VOIP_buf_dl_index = 0;
 static UInt32 lp_voip_mic;
 static UInt32 lp_voip_speaker;
 
+//UInt32 lp_voip_start = 0; /* 20110715 for loopback check */
+UInt32 varyExtPGA=23;
+
+
 static Boolean LB_VOIP_DumpUL_CB(
 AUDIO_DRIVER_HANDLE_t drv_handle,
 UInt8		*pSrc,		// pointer to start of speech data
@@ -920,7 +924,7 @@ BCMPCG_ioctl(struct inode *inode, struct file *file,
         lbpaths[1] = lb_output;
 
         copy_to_user( (UInt32 *)arg, lbpaths, 2* sizeof(UInt32));
-    
+
         rtn = 1;
         DEBUG("AUD:PCG_IOCTL_GETLPBKPATH lb_output=%d loopback_input=%d  \n",lb_output,loopback_input);
 
@@ -930,16 +934,50 @@ BCMPCG_ioctl(struct inode *inode, struct file *file,
     {
 //        UInt32 lb_output;
         UInt32 lbpaths[2];
-
+#if 1   //CHINA Serated LOOP GAIN table for AT mode
+	 UInt16 voip_audio_mode;
+#endif
         copy_from_user(lbpaths, (UInt32 *)arg, 2* sizeof(UInt32));
-    
 
-        if(lbpaths[1] == 2)
+
+          if(lbpaths[1] == 2)
             lbpaths[1] = 4;
          loopback_input = lbpaths[0];
          loopback_output = lbpaths[1];
 
-        AUDCTRL_SetAudioLoopback(1,loopback_input,loopback_output);
+#if 1   //CHINA Serated LOOP GAIN table for AT mode
+     DEBUG("AUD:PCG_IOCTL_GETLPBKPATH loopback_output: %d \n", loopback_output);
+		 // save the audio mode
+         switch (loopback_output)
+         {
+                    case AUDIO_MODE_HANDSET:
+#ifdef TTY_ENABLED
+                        voip_audio_mode = loopback_output;
+#else
+                        voip_audio_mode = AUDIO_MODE_TTY;
+#endif
+                        break;
+                    case AUDIO_MODE_HEADSET:
+                   DEBUG("AUD:PCG_IOCTL_GETLPBKPATH to HAC \n");
+                       voip_audio_mode = AUDIO_MODE_HAC;
+                        break;
+                    case AUDIO_MODE_BLUETOOTH:
+                    case AUDIO_MODE_HANDSFREE: // BT NREC
+                        voip_audio_mode = AUDIO_MODE_USB;
+                        break;
+                    case AUDIO_MODE_SPEAKERPHONE:
+                        voip_audio_mode = AUDIO_MODE_RESERVE;
+                        break;
+                    default :
+                        voip_audio_mode = loopback_output;
+                        break;
+           }
+
+                AUDCTRL_SaveAudioModeFlag(voip_audio_mode, AUDIO_APP_VOICE_CALL);
+#endif
+
+	        AUDCTRL_SetAudioLoopback(1,loopback_input,loopback_output);		
+
         rtn = 1;
         DEBUG("AUD:PCG_IOCTL_SETLPBKPATH loopback_output=%d loopback_input=%d  \n",loopback_output,loopback_input);
 
@@ -1101,7 +1139,41 @@ BCMPCG_ioctl(struct inode *inode, struct file *file,
                 powerOnExternalAmp( amp_path, AudioUseExtSpkr, amp_onoff );
             }
             return 1;            
-            
+            case 119:  /*20111020 for headset analog gain*/
+            {
+                UInt32 curvol=0;
+                UInt32 extvol=22;
+  		   Int16 audioMode;
+#ifdef CONFIG_BOARD_TASSVE            
+		   int var_hsgain[16]={21/*0*/,21/*1*/,21/*2*/,21/*3*/,21/*4*/,21/*5*/,21/*6*/,21/*7*/,22/*8*/,23/*9*/,\
+		   					24/*10*/,25/*11*/,26/*12*/,27/*13*/,29/*14*/,31/*15*/};
+#elif CONFIG_BOARD_COOPERVE            
+		   int var_hsgain[16]={20/*0*/,20/*1*/,20/*2*/,20/*3*/,20/*4*/,20/*5*/,20/*6*/,20/*7*/,21/*8*/,23/*9*/,\
+		   					24/*10*/,25/*11*/,26/*12*/,27/*13*/,28/*14*/,29/*15*/};
+#endif	
+		   audioMode = AUDCTRL_GetAudioMode();
+
+		    if(audioMode >= AUDIO_MODE_NUMBER)
+		        audioMode -= AUDIO_MODE_NUMBER;
+
+		    if (audioMode == AUDIO_MODE_HEADSET)
+		    {
+		                curvol = voip.val2;
+
+				if((curvol<0) || (curvol>16)){
+					extvol=22;
+				}
+				else{	
+					extvol=var_hsgain[curvol];
+				}	
+	   
+		   DEBUG("AUD: SetExtPAVol   curvol=%d   extvol=%d  \r\n",curvol,extvol);
+                    varyExtPGA=extvol;
+		   setExternalAmpGain(extvol);
+		  }    		   
+            }
+            return 1;   
+		
             case 121:
             {
                 
