@@ -1,5 +1,5 @@
 #Makefile for xscript kernel
-#EXTRA_CFLAGS := -Werror
+EXTRA_CFLAGS := -Werror
 
 EXTRA_CFLAGS += -DUNDER_LINUX
 
