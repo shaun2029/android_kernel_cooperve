@@ -29,7 +29,7 @@
  * It helps to keep variable names smaller, simpler
  */
 
-#define DEF_FREQUENCY_UP_THRESHOLD		(85)
+#define DEF_FREQUENCY_UP_THRESHOLD		(75)
 #define DEF_FREQUENCY_DOWN_THRESHOLD		(50)
 
 /*
@@ -46,12 +46,12 @@
 
 static unsigned int min_sampling_rate;
 
-#define LATENCY_MULTIPLIER			(500)
+#define LATENCY_MULTIPLIER			(300)
 #define MIN_LATENCY_MULTIPLIER			(100)
-#define DEF_SAMPLING_DOWN_FACTOR		(1)
+#define DEF_SAMPLING_DOWN_FACTOR		(2)
 #define MAX_SAMPLING_DOWN_FACTOR		(10)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)
-#define DEFAULT_FREQUENCY_STEP		(15)
+#define DEFAULT_FREQUENCY_STEP			(15)
 
 static void do_dbs_timer(struct work_struct *work);
 
