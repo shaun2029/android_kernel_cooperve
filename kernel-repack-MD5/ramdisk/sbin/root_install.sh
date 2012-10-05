@@ -1,9 +1,15 @@
 #!/sbin/sh
 
+if /sbin/test ! -d /system/xbin; then
+	/sbin/mkdir -p /system/xbin
+fi
+
 if /sbin/test ! -f /system/xbin/su; then
 	/sbin/cp /sbin/su-bin /system/xbin/su
+	/sbin/chown 0.0 /system/xbin/su
 	/sbin/chmod 6755 /system/xbin/su
 else
+	/sbin/chown 0.0 /system/xbin/su
 	/sbin/chmod 6755 /system/xbin/su
 fi
 
