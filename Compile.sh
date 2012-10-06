@@ -10,16 +10,6 @@ cd common
 
 make mrproper && make bcm21553_cooperve_defconfig && make xconfig
 
-if [ -f ../clean ]; then
-	rm ../clean
-	cd ..
-	rm -Rf kernel-repack-MD5/*.lzma kernel-repack-MD5/*.gz kernel-repack-MD5/boot.img-kernel
-	rm -Rf kernel-repack-MD5/CWM_kernel/boot.img
-	rm -Rf kernel-repack-MD5/CWM_kernel/system/lib/modules/*
-	rm *.zip *.tar
-	exit
-fi
-
 echo "Ready to compile? Hit <Enter> to Continue or <Ctrl>+<C> to Cancel!";
 sleep 1 && read
 echo $(date +%Y%m%d%H%M) > .version
