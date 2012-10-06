@@ -58,8 +58,8 @@ if [ -f run.sh ] && [ -f md5 ]; then
 	cd ..
 	tar -cvf PDA-boot.img.tar boot.img && mv boot.img CWM_kernel/ && cd CWM_kernel && zip -r ../CWM-boot.img-modules.zip . ;
 	cd ..
-	mv CWM-boot.img-modules.zip ../$(cat ../common/.version)-CWM-boot.img-modules.zip && 	echo '$(cat ../common/.version)-CWM-kernel-modules.zip <-> READY'
-	mv PDA-boot.img.tar ../$(cat ../common/.version)-PDA-boot.img.tar && echo '$(cat ../common/.version)-PDA-boot.img.tar <-> READY'
+	mv CWM-boot.img-modules.zip ../$(cat ../common/.version)-CWM-boot.img-modules.zip && 	echo "$(cat ../common/.version)-CWM-kernel-modules.zip <-> READY"
+	mv PDA-boot.img.tar ../$(cat ../common/.version)-PDA-boot.img.tar && echo "$(cat ../common/.version)-PDA-boot.img.tar <-> READY"
 else
 	echo "boot.img creation - Faill"; sleep 5; exit
 fi
