@@ -174,5 +174,4 @@ config HEADSET_DET_GPIO
 	bool "Samsung BCM2155x LUISA 0_2 board Headset"
 
 
-
 endmenu
