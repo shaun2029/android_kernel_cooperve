@@ -8,15 +8,17 @@ on init
     export ANDROID_DATA /data
     export EXTERNAL_STORAGE /sdcard
 
+    symlink /system/etc /etc
+
     mkdir /sdcard
     mkdir /sd-ext
-    mkdir /etc
     mkdir /system
     mkdir /data
     mkdir /cache
     mkdir /tmp
     mkdir /dbdata
     mkdir /mnt 0775 root root
+    #mount /tmp /tmp tmpfs   
 
 on early-fs
 
@@ -31,7 +33,6 @@ on fs
     mount tmpfs tmpfs /tmp
     mount rfs /dev/stl9 /system check=no
     mount rfs /dev/stl9 /system remount
-
 on post-fs
 
     write /proc/sys/kernel/panic_on_oops 1
@@ -42,7 +43,6 @@ on post-fs
     write /proc/sys/kernel/sched_compat_yield 1
     write /proc/sys/kernel/sched_child_runs_first 0
     write /proc/LinuStoreIII/fsbuild_check BUILDING
-
 on boot
 
     ifup lo
@@ -51,13 +51,12 @@ on boot
 
     class_start default
 
-    exec /sbin/bmlunlock
-    symlink /res/recovery.fstab /etc/recovery.fstab
+	exec /sbin/bmlunlock
 
 service ueventd /sbin/ueventd
     critical
 
-#service console /sbin/sh
+#service console /system/bin/sh
 #    console
 
 service recovery /sbin/recovery
@@ -65,8 +64,8 @@ service recovery /sbin/recovery
 service adbd /sbin/adbd recovery
 	disabled
 
-on property:persist.service.adb.enable=1
-    start adbd
+#on property:persist.service.adb.enable=1
+#    start adbd
 
 on property:persist.service.adb.enable=0
     stop adbd

@@ -1,29 +1,56 @@
-#!/sbin/sh
+#!/sbin/busybox sh
 
-if /sbin/test ! -d /system/xbin; then
-	/sbin/mkdir -p /system/xbin
+bbdir="/system/bin /system/xbin" ; 
+ndeletes=0 ; 
+for bbpath in $bbdir ; 
+	do 
+		for f in $(busybox find $bbpath -type l) ; 
+			do 
+				gnr=$(busybox readlink $f) ; 
+				if echo "$gnr" |busybox grep -q busybox ; 
+					then 
+						busybox echo "$f linking to $gnr . Now deleting" ; 
+						busybox rm $f ; 
+						ndeletes=`busybox expr $ndeletes + 1` ; 
+					else busybox echo "$f is not linked to busybox, but to $gnr ---> file not deleted" ; 
+				fi ; 
+		done 
+done
+
+if -f /system/bin/busybox ; then
+	/sbin/busybox rm -Rf /system/bin/busybox
 fi
 
-if /sbin/test ! -f /system/xbin/su; then
-	/sbin/cp /sbin/su-bin /system/xbin/su
-	/sbin/chown 0.0 /system/xbin/su
-	/sbin/chmod 6755 /system/xbin/su
-else
-	/sbin/chown 0.0 /system/xbin/su
-	/sbin/chmod 6755 /system/xbin/su
+if -f /system/xbin/busybox ; then
+	/sbin/busybox rm -Rf /system/xbin/busybox
+fi
+
+if /sbin/busybox test ! -d /system/sbin; then
+	/sbin/busybox mkdir -p /system/sbin
+fi
+
+if /sbin/busybox test ! -f /system/sbin/busybox; then
+	/sbin/busybox cp /sbin/busybox /system/sbin/busybox
+	/system/sbin/busybox --install -s /system/sbin
+fi
+
+if /sbin/busybox test ! -d /system/xbin; then
+	/sbin/busybox mkdir -p /system/xbin
 fi
 
 if -f /system/sbin/su; then
-	/sbin/rm -Rf /system/sbin/su
+	/sbin/busybox rm -Rf /system/sbin/su
 fi
 
 if -f /system/bin/su; then
-	/sbin/rm -Rf /system/bin/su
+	/sbin/busybox rm -Rf /system/bin/su
 fi
 
-if /sbin/test ! -f /system/Superuser.apk || -f /system/Supersu.apk; then
-	/sbin/cp /sbin/Superuser.apk /system/app/Superuser.apk
-	/sbin/chmod 0644 /system/Superuser.apk
+if /sbin/busybox test ! -f /system/xbin/su; then
+	/sbin/busybox cp /sbin/su-bin /system/xbin/su
+	/sbin/busybox chown 0.0 /system/xbin/su
+	/sbin/busybox chmod 6755 /system/xbin/su
 else
-	/sbin/chmod 0644 /system/Superuser.apk
+	/sbin/busybox chown 0.0 /system/xbin/su
+	/sbin/busybox chmod 6755 /system/xbin/su
 fi
