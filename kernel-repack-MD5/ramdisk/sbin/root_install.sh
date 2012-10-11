@@ -17,11 +17,11 @@ for bbpath in $bbdir ;
 		done 
 done
 
-if -f /system/bin/busybox ; then
+if /sbin/busybox test -f /system/bin/busybox ; then
 	/sbin/busybox rm -Rf /system/bin/busybox
 fi
 
-if -f /system/xbin/busybox ; then
+if /sbin/busybox test -f /system/xbin/busybox ; then
 	/sbin/busybox rm -Rf /system/xbin/busybox
 fi
 
@@ -34,16 +34,16 @@ if /sbin/busybox test ! -f /system/sbin/busybox; then
 	/system/sbin/busybox --install -s /system/sbin
 fi
 
-if /sbin/busybox test ! -d /system/xbin; then
-	/sbin/busybox mkdir -p /system/xbin
-fi
-
-if -f /system/sbin/su; then
+if /sbin/busybox test -f /system/sbin/su; then
 	/sbin/busybox rm -Rf /system/sbin/su
 fi
 
-if -f /system/bin/su; then
+if /sbin/busybox test -f /system/bin/su; then
 	/sbin/busybox rm -Rf /system/bin/su
+fi
+
+if /sbin/busybox test ! -d /system/xbin; then
+	/sbin/busybox mkdir -p /system/xbin
 fi
 
 if /sbin/busybox test ! -f /system/xbin/su; then
