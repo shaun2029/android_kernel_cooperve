@@ -1,20 +1,28 @@
-ui_print("Install Files");
-mount("MTD", "system", "/system");
+mount("rfs", "EMMC", "/dev/block/stl9", "/system");
+
+ui_print("Installing Files");
+
 package_extract_dir("system", "/system");
 
-ui_print("Set perm for modules");
-set_perm_recursive(0, 0, 0755, 0644, "/system/lib/modules");
-
-ui_print("Set perm for init.d");
 set_perm_recursive(0, 0, 0755, 0754, "/system/etc/init.d");
 
-ui_print("unlock boot partition");
+set_perm_recursive(0, 0, 0755, 0644, "/system/lib/modules");
+	 
+ui_print("Preparing for flashing Boot Image..");
+
+# copying files in ramdisk
+package_extract_file("busybox", "busybox");
 package_extract_file("bmlunlock", "bmlunlock");
-set_perm(0, 0, 0755, "bmlunlock");
-run_program("bmlunlock");
-
-ui_print("Flash Boot.img");
 package_extract_file("boot.img", "boot.img");
-run_program("/system/bin/dd", "if=boot.img", "of=/dev/block/bml7");
+set_perm(0, 0, 0755, "bmlunlock");
+set_perm(0, 0, 0755, "busybox");
 
+ui_print("Flashing Boot.img");
+
+# flashing
+run_program("bmlunlock");
+run_program("busybox", "dd", "if=boot.img", "of=/dev/block/bml7");
+unmount("/data");
 unmount("/system");
+unmount("/sd-ext");
+ui_print("DONE !!!");

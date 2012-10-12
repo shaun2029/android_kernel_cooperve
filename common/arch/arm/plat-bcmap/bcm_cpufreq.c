@@ -351,7 +351,7 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
 	local_irq_disable();
 
-	/*
+	/* Get the turbo mode frequency. Switching to and from turbo mode
 	 * needs special handling.
 	 */
 	index_turbo = info->index_turbo;
