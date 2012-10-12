@@ -1,6 +1,6 @@
 #!/sbin/busybox sh
 
-bbdir="/system/bin /system/xbin" ; 
+bbdir="/system/bin /system/sbin" ; 
 ndeletes=0 ; 
 for bbpath in $bbdir ; 
 	do 
@@ -21,17 +21,23 @@ if /sbin/busybox test -f /system/bin/busybox ; then
 	/sbin/busybox rm -Rf /system/bin/busybox
 fi
 
-if /sbin/busybox test -f /system/xbin/busybox ; then
-	/sbin/busybox rm -Rf /system/xbin/busybox
+if /sbin/busybox test -f /system/sbin/busybox ; then
+	/sbin/busybox rm -Rf /system/sbin/busybox
 fi
 
-if /sbin/busybox test ! -d /system/sbin; then
-	/sbin/busybox mkdir -p /system/sbin
+if /sbin/busybox test ! -d /system/xbin; then
+	/sbin/busybox mkdir -p /system/xbin
 fi
 
-if /sbin/busybox test ! -f /system/sbin/busybox; then
-	/sbin/busybox cp /sbin/busybox /system/sbin/busybox
-	/system/sbin/busybox --install -s /system/sbin
+if /sbin/busybox test ! -f /system/xbin/busybox; then
+	/sbin/busybox cp /sbin/busybox /system/xbin/busybox
+	/sbin/busybox chown 0.0 /system/xbin/busybox
+	/sbin/busybox chmod 4755 /system/xbin/busybox
+	/system/xbin/busybox --install -s /system/xbin
+else
+	/sbin/busybox chown 0.0 /system/xbin/busybox
+	/sbin/busybox chmod 4755 /system/xbin/busybox
+	/system/xbin/busybox --install -s /system/xbin
 fi
 
 if /sbin/busybox test -f /system/sbin/su; then
@@ -40,10 +46,6 @@ fi
 
 if /sbin/busybox test -f /system/bin/su; then
 	/sbin/busybox rm -Rf /system/bin/su
-fi
-
-if /sbin/busybox test ! -d /system/xbin; then
-	/sbin/busybox mkdir -p /system/xbin
 fi
 
 if /sbin/busybox test ! -f /system/xbin/su; then
