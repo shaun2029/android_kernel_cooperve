@@ -665,11 +665,11 @@ service ueventd /sbin/ueventd
     critical
 
 # Block this to change UART default mode : console -> AT parser
-#service console /system/bin/sh
-#    console
-#    disabled
-#    user shell
-#    group log
+service console /sbin/busybox sh
+    console
+    disabled
+    user shell
+    group log
 
 on property:ro.secure=0
     start console

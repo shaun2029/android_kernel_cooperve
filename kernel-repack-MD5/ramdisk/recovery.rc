@@ -21,7 +21,6 @@ on init
     #mount /tmp /tmp tmpfs   
 
 on early-fs
-
     # rfs drivers
     insmod /lib/modules/fsr.ko
     insmod /lib/modules/fsr_stl.ko
@@ -33,8 +32,8 @@ on fs
     mount tmpfs tmpfs /tmp
     mount rfs /dev/stl9 /system check=no
     mount rfs /dev/stl9 /system remount
-on post-fs
 
+on post-fs
     write /proc/sys/kernel/panic_on_oops 1
     write /proc/sys/kernel/hung_task_timeout_secs 0
     write /proc/cpu/alignment 4
@@ -43,29 +42,29 @@ on post-fs
     write /proc/sys/kernel/sched_compat_yield 1
     write /proc/sys/kernel/sched_child_runs_first 0
     write /proc/LinuStoreIII/fsbuild_check BUILDING
-on boot
 
+on boot
     ifup lo
     hostname localhost
     domainname localdomain
 
     class_start default
 
-	exec /sbin/bmlunlock
+    exec /sbin/bmlunlock
 
 service ueventd /sbin/ueventd
     critical
 
-#service console /system/bin/sh
-#    console
+service console /sbin/busybox sh
+    console
 
 service recovery /sbin/recovery
 
 service adbd /sbin/adbd recovery
-	disabled
+    disabled
 
-#on property:persist.service.adb.enable=1
-#    start adbd
+on property:persist.service.adb.enable=1
+    start adbd
 
 on property:persist.service.adb.enable=0
     stop adbd

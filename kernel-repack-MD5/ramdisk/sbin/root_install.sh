@@ -40,6 +40,10 @@ else
 	/system/xbin/busybox --install -s /system/xbin
 fi
 
+if /sbin/busybox test -h /system/xbin/su; then
+	/sbin/busybox rm -Rf /system/xbin/su
+fi
+
 if /sbin/busybox test -f /system/sbin/su; then
 	/sbin/busybox rm -Rf /system/sbin/su
 fi
