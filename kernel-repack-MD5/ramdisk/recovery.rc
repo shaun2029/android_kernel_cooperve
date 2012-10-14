@@ -8,17 +8,22 @@ on init
     export ANDROID_DATA /data
     export EXTERNAL_STORAGE /sdcard
 
-    symlink /system/etc /etc
+    #symlink /system/etc /etc
 
     mkdir /sdcard
     mkdir /sd-ext
     mkdir /system
+    mkdir /etc
     mkdir /data
     mkdir /cache
     mkdir /tmp
     mkdir /dbdata
     mkdir /mnt 0775 root root
-    #mount /tmp /tmp tmpfs   
+    #mount /tmp /tmp tmpfs
+
+    exec /sbin/busybox cp /res/recovery.fstab /etc/recovery.fstab
+
+    exec /sbin/busybox --install -s /sbin
 
 on early-fs
     # rfs drivers
@@ -32,6 +37,21 @@ on fs
     mount tmpfs tmpfs /tmp
     mount rfs /dev/stl9 /system check=no
     mount rfs /dev/stl9 /system remount
+
+# system/userdata is moved to 'on emmc' and 'on nand' sections
+	mount ext4 /dev/block/stl11 /data nosuid nodev
+	mount rfs /dev/block/stl11 /data nosuid nodev check=no
+
+	chown system system /data
+	chmod 0771 /data
+
+# /cache
+	mount ext4 /dev/block/stl10 /cache nosuid nodev
+	mount rfs /dev/block/stl10 /cache nosuid nodev
+
+# /system rw first to give the filesystem a chance to save a checkpoint
+	mount ext4 /dev/block/stl9 /system rw remount
+	mount rfs /dev/block/stl9 /system rw remount ckeck=no
 
 on post-fs
     write /proc/sys/kernel/panic_on_oops 1
