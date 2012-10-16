@@ -2,7 +2,7 @@ on early-init
     start ueventd
 
 on init
-    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin#:/system/xbin
+    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
     export LD_LIBRARY_PATH /vendor/lib:/system/lib
     export ANDROID_ROOT /system
     export ANDROID_DATA /data
@@ -24,6 +24,8 @@ on init
     exec /sbin/busybox cp /res/recovery.fstab /etc/recovery.fstab
 
     exec /sbin/busybox --install -s /sbin
+
+    exec /sbin/busybox rm -Rf /sbin/ls
 
 on early-fs
     # rfs drivers
@@ -75,16 +77,16 @@ on boot
 service ueventd /sbin/ueventd
     critical
 
-#service console /sbin/busybox sh
-#    console
+service console /sbin/busybox sh
+    console
 
 service recovery /sbin/recovery
 
-#service adbd /sbin/adbd recovery
-#    disabled
+service adbd /sbin/adbd recovery
+    disabled
 
-#on property:persist.service.adb.enable=1
-#    start adbd
+on property:persist.service.adb.enable=1
+    start adbd
 
 on property:persist.service.adb.enable=0
     stop adbd
