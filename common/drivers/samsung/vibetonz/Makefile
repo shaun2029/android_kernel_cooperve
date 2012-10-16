@@ -4,7 +4,7 @@
 
 obj-$(CONFIG_VIBETONZ) += vibrator.o
 
-vibrator-objs +=tspdrv.o 
+vibrator-objs += tspdrv.o 
 
 all:
 	@echo "$(MAKE) --no-print-directory -C $(KDIR) SUBDIRS=$(CURDIR) modules"
