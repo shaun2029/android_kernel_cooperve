@@ -679,7 +679,7 @@ service ueventd /sbin/ueventd
     critical
 
 ## Block this to change UART default mode : console -> AT parser
-#service console /sbin/busybox sh
+#service console /sbin/sh
 #    console
 #    disabled
 #    user shell
