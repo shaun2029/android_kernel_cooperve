@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export PATH=$PATH:$PWD/host/usr/bin
-export CROSS_COMPILE=arm-linux-
-export CC=arm-linux-gcc
-export CXX=arm-linux-g++
+#export PATH=$PATH:$PWD/host/usr/bin
+export CROSS_COMPILE=arm-linux-gnueabi-
+export CC=arm-linux-gnueabi-gcc
+export CXX=arm-linux-gnueabi-g++
 export ARCH=arm
 
 cd common && make mrproper && touch ../clear

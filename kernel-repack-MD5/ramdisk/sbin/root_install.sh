@@ -17,12 +17,17 @@ for bbpath in $bbdir ;
 		done 
 done
 
-if /sbin/busybox test -f /system/bin/busybox ; then
+if /sbin/busybox test -f /system/bin/busybox; then
 	/sbin/busybox rm -Rf /system/bin/busybox
 fi
 
-if /sbin/busybox test -f /system/sbin/busybox ; then
+if /sbin/busybox test ! -d /system/sbin; then
+	/sbin/busybox mkdir /system/sbin
+fi
+
+if /sbin/busybox test ! -h /system/sbin/busybox ; then
 	/sbin/busybox rm -Rf /system/sbin/busybox
+	/sbin/busybox ln -s /system/xbin/busybox /system/sbin/busybox
 fi
 
 if /sbin/busybox test ! -d /system/xbin; then
