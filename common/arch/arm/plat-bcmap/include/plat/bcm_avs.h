@@ -44,12 +44,24 @@ struct silicon_type_info
 	int lpm_voltage;
 	/* NM voltage. Pass -1 if no update needed */
 	int nm_voltage;
+	/* NM2 osuper mode voltage. Pass -1 if no update needed */
+	int nm2_osuper_voltage;
+	/* NM2 super mode voltage. Pass -1 if no update needed */
+	int nm2_super_voltage;
 	/* NM2 turbo mode voltage. Pass -1 if no update needed */
 	int nm2_turbo_voltage;
-	int nm2_fast_voltage;
-	/* NM2 turbo mode voltage. Pass -1 if no update needed */
+	/* NM2 higher mode voltage. Pass -1 if no update needed */
+	int nm2_heigher_voltage;
+	/* NM2 omedium mode voltage. Pass -1 if no update needed */
+	int nm2_omedium_voltage;
+	/* NM2 umedium mode voltage. Pass -1 if no update needed */
+	int nm2_umedium_voltage;
+	/* NM2 normal mode voltage. Pass -1 if no update needed */
 	int nm2_normal_voltage;
-	int nm2_slow_voltage;
+	/* NM2 starter mode voltage. Pass -1 if no update needed */
+	int nm2_starter_voltage;
+	/* NM2 lower mode voltage. Pass -1 if no update needed */
+	int nm2_lower_voltage;
 };
 
 struct bcm_avs_platform_data_t
@@ -63,10 +75,51 @@ struct bcm_avs_platform_data_t
 	 * Pass NULL if not supported/need not update
 	 */
 	char *core_nml_regl;
+
+	/* Name of the regulator to control core lower mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_lower_regl;
+
+	/* Name of the regulator to control core starter mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_starter_regl;
+
+	/* Name of the regulator to control core normal mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_normal_regl;
+
+	/* Name of the regulator to control core umedium mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_umedium_regl;
+
+	/* Name of the regulator to control core omedium mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_omedium_regl;
+
+	/* Name of the regulator to control core higher mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_heigher_regl;
+
 	/* Name of the regulator to control core turbo mode voltage
 	 * Pass NULL if not supported/need not update
 	 */
 	char *core_turbo_regl;
+
+	/* Name of the regulator to control core super mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_super_regl;
+
+	/* Name of the regulator to control core osuper mode voltage
+	 * Pass NULL if not supported/need not update
+	 */
+	char *core_osuper_regl;
 
 	/* OTP params to idenltify silicon type.
 	 * Assumption : total number of bits <=32

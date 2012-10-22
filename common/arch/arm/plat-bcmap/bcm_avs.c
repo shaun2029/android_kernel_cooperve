@@ -153,6 +153,102 @@ static int bcm_avs_drv_probe(struct platform_device *pdev)
 		regulator_put(regl);
 	}
 
+	/* It is assumed that, at boot up system is in lower mode */
+	if (pdata->core_lower_regl && type_info->nm2_lower_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_lower_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Lower mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_lower_voltage,
+				      type_info->nm2_lower_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in starter mode */
+	if (pdata->core_starter_regl && type_info->nm2_starter_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_starter_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Starter mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_starter_voltage,
+				      type_info->nm2_starter_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in normal mode */
+	if (pdata->core_nml_regl && type_info->nm2_normal_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_nml_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Normal mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_normal_voltage,
+				      type_info->nm2_normal_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in umedium mode */
+	if (pdata->core_umedium_regl && type_info->nm2_umedium_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_umedium_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Under_Medium mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_umedium_voltage,
+				      type_info->nm2_umedium_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in omedium mode */
+	if (pdata->core_omedium_regl && type_info->nm2_omedium_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_omedium_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Over_Medium mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_omedium_voltage,
+				      type_info->nm2_omedium_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in heigher mode */
+	if (pdata->core_heigher_regl && type_info->nm2_heigher_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_heigher_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Heigher mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_heigher_voltage,
+				      type_info->nm2_heigher_voltage);
+		regulator_put(regl);
+	}
+
 	/* It is assumed that, at boot up system is in turbo mode */
 	if (pdata->core_turbo_regl && type_info->nm2_turbo_voltage != -1)
 	{
@@ -166,6 +262,38 @@ static int bcm_avs_drv_probe(struct platform_device *pdev)
 		}
 		regulator_set_voltage(regl, type_info->nm2_turbo_voltage,
 				      type_info->nm2_turbo_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in super mode */
+	if (pdata->core_super_regl && type_info->nm2_super_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_super_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Super mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_super_voltage,
+				      type_info->nm2_super_voltage);
+		regulator_put(regl);
+	}
+
+	/* It is assumed that, at boot up system is in osuper mode */
+	if (pdata->core_osuper_regl && type_info->nm2_osuper_voltage != -1)
+	{
+		regl = regulator_get(NULL, pdata->core_osuper_regl);
+		if(IS_ERR(regl))
+		{
+			pr_info("%s: Core Over_Super mode regulator_get failed\n",
+				__func__);
+			ret = PTR_ERR(regl);
+			goto error;
+		}
+		regulator_set_voltage(regl, type_info->nm2_osuper_voltage,
+				      type_info->nm2_osuper_voltage);
 		regulator_put(regl);
 	}
 

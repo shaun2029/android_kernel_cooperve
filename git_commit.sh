@@ -22,6 +22,6 @@ if [ -f clear ]; then
 fi
 
 if [ -f commit ]; then
-	git push -u origin master && rm commit
+	git push -u origin test && rm commit
 fi
 echo 'hit <Enter> to close!!!'; read

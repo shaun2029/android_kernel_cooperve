@@ -62,6 +62,8 @@
 
 #include <linux/mfd/max8986/max8986.h>
 
+#include <mach/clkmgr.h>
+
 #if defined(CONFIG_SERIAL_8250) || defined(CONFIG_SERIAL_8250_MODULE)
 /*!
  * The serial port definition structure.
@@ -241,10 +243,10 @@ int bcmsdhc_enable_int(void __iomem *ioaddr, u8 ctrl_slot)
 	return 0;
 }
 
-/* *************************************************************************************************** */
-/* Function Name: bcmsdhc_external_reset */
-/* Description: external reset SD host */
-/* *************************************************************************************************** */
+/* *************************************************** */
+/* Function Name: bcmsdhc_external_reset               */
+/* Description: external reset SD host                 */
+/* *************************************************** */
 
 int bcmsdhc_external_reset(void __iomem *ioaddr, u8 ctrl_slot)
 {
@@ -313,7 +315,7 @@ struct platform_device bcm21553_sdhc_slot1 = {
 	.resource = sdhc1_resources,
 };
 EXPORT_SYMBOL(bcm21553_sdhc_slot1);
-#if !defined(CONFIG_MTD_ONENAND)
+#if !defined(CONFIG_MTD_ONENAND) && !defined(CONFIG_MTD_NAND)
 /*
  * SDHC2 is used for eMMC and SDHC2 shares pin mux with FLASH(OneNAND)
  * So both OneNAND and SDHC2 cannot co-exist
@@ -434,17 +436,17 @@ struct platform_device bcm_pwm_device = {
 
 static struct resource bcm_auxadc_resource[] = {
         {
-                .start  = IO_ADDRESS(BCM21553_AUXADC_BASE),
-                .end    = IO_ADDRESS(BCM21553_AUXADC_BASE) + SZ_16 - 1,
-                .flags  = IORESOURCE_MEM,
+			.start  = IO_ADDRESS(BCM21553_AUXADC_BASE),
+			.end    = IO_ADDRESS(BCM21553_AUXADC_BASE) + SZ_16 - 1,
+			.flags  = IORESOURCE_MEM,
         },
 };
 
 struct platform_device auxadc_device={
-        .name = "bcm_auxadc",
-        .id   = -1,
-	.resource       = bcm_auxadc_resource,
-        .num_resources  = ARRAY_SIZE(bcm_auxadc_resource),
+    .name = "bcm_auxadc",
+    .id   = -1,
+	.resource	= bcm_auxadc_resource,
+	.num_resources  = ARRAY_SIZE(bcm_auxadc_resource),
 };
 #endif
 
@@ -533,6 +535,21 @@ struct platform_device	bcm21xx_dma_device = {
 #endif
 
 #ifdef CONFIG_BCM215XX_DSS
+
+#ifdef CONFIG_LCD_CONTROLLER_DSI
+static struct resource lcdc_resources[] = {
+	{
+	    .start	= IO_ADDRESS(BCM21553_DSI_BASE),
+	    .end	= IO_ADDRESS(BCM21553_DSI_BASE) + SZ_4K - 1,
+	    .flags	= IORESOURCE_MEM,
+	 },
+	{
+	    .start	= IRQ_DSI,
+	    .end	= IRQ_DSI,
+	    .flags	= IORESOURCE_IRQ,
+	},
+};
+#else//CONFIG_LCD_CONTROLLER_LEGACY
 static struct resource lcdc_resources[] = {
 	{
 	 .start = IO_ADDRESS(BCM21553_LCDC_BASE),
@@ -540,6 +557,7 @@ static struct resource lcdc_resources[] = {
 	 .flags = IORESOURCE_MEM,
 	 },
 };
+#endif //CONFIG_LCD_CONTROLLER_DSI
 
 struct platform_device bcm215xx_lcdc_device = {
 	.name		= "LCDC",
@@ -547,12 +565,31 @@ struct platform_device bcm215xx_lcdc_device = {
 	.resource	= lcdc_resources,
 	.num_resources	= ARRAY_SIZE(lcdc_resources),
 };
-#endif
 
-#define BCM_CORE_CLK_SLOW	BCM21553_CORECLK_MHZ_156
-#define BCM_CORE_CLK_NORMAL	BCM21553_CORECLK_MHZ_312
-#define BCM_CORE_CLK_FAST	BCM21553_CORECLK_MHZ_624
-#define BCM_CORE_CLK_TURBO	BCM21553_CORECLK_MHZ_832
+#endif //CONFIG_BCM215XX_DSS
+
+/* List of arm core clk frequencies. */
+enum {
+	BCM21553_CORECLK_MHZ_234 = (234U * 1000),
+	BCM21553_CORECLK_MHZ_288 = (288U * 1000),
+	BCM21553_CORECLK_MHZ_312 = (312U * 1000),
+	BCM21553_CORECLK_MHZ_416 = (416U * 1000),
+	BCM21553_CORECLK_MHZ_468 = (468U * 1000),
+	BCM21553_CORECLK_MHZ_624 = (624U * 1000),
+	BCM21553_CORECLK_MHZ_832 = (832U * 1000),
+	BCM21553_CORECLK_MHZ_936 = (936U * 1000),
+	BCM21553_CORECLK_MHZ_1GB = (1248U * 1000),
+};
+
+#define BCM_CORE_CLK_OSUPER		BCM21553_CORECLK_MHZ_1GB
+#define BCM_CORE_CLK_SUPER		BCM21553_CORECLK_MHZ_936
+#define BCM_CORE_CLK_TURBO		BCM21553_CORECLK_MHZ_832
+#define BCM_CORE_CLK_HEIGHER	BCM21553_CORECLK_MHZ_624
+#define BCM_CORE_CLK_OMEDIUM	BCM21553_CORECLK_MHZ_468
+#define BCM_CORE_CLK_UMEDIUM	BCM21553_CORECLK_MHZ_416
+#define BCM_CORE_CLK_NORMAL		BCM21553_CORECLK_MHZ_312
+#define BCM_CORE_CLK_STARTER	BCM21553_CORECLK_MHZ_288
+#define BCM_CORE_CLK_LOWER		BCM21553_CORECLK_MHZ_234
 
 #if defined(CONFIG_BCM_CPU_FREQ)
 /*********************************************************************
@@ -561,19 +598,31 @@ struct platform_device bcm215xx_lcdc_device = {
 
 /* Indices for the voltage to frequency mapping table */
 enum {
-	BCM_SLOW_MODE,
+	BCM_LOWER_MODE,
+	BCM_STARTER_MODE,
 	BCM_NORMAL_MODE,
-	BCM_FAST_MODE,
- 	BCM_TURBO_MODE,
+	BCM_UMEDIUM_MODE,
+	BCM_OMEDIUM_MODE,
+	BCM_HEIGHER_MODE,
+	BCM_TURBO_MODE,
+	BCM_SUPER_MODE,
+	BCM_OSUPER_MODE,
 };
 
 /* Voltage-Frequency mapping for BCM21553 CPU0 */
 static struct bcm_freq_tbl bcm215xx_cpu0_freq_tbl[] = {
-	FTBL_INIT(BCM_CORE_CLK_SLOW / 1000, 1140000),
+	/* NOW WE NEED ONLY TO FIXE VOLTAGES*/
+	FTBL_INIT(BCM_CORE_CLK_LOWER / 1000, 1120000),
+	FTBL_INIT(BCM_CORE_CLK_STARTER / 1000, 1160000),
 	FTBL_INIT(BCM_CORE_CLK_NORMAL / 1000, 1180000),
-	FTBL_INIT(BCM_CORE_CLK_FAST / 1000, 1220000),
-	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1240000),
+	FTBL_INIT(BCM_CORE_CLK_UMEDIUM / 1000, 1200000),
+	FTBL_INIT(BCM_CORE_CLK_OMEDIUM / 1000, 1240000),
+	FTBL_INIT(BCM_CORE_CLK_HEIGHER / 1000, 1280000),
+	FTBL_INIT(BCM_CORE_CLK_TURBO / 1000, 1320000),
+	FTBL_INIT(BCM_CORE_CLK_SUPER / 1000, 1340000),
+	FTBL_INIT(BCM_CORE_CLK_OSUPER / 1000, 1360000),
 };
+
 /* BCM21553 CPU info */
 static struct bcm_cpu_info bcm215xx_cpu_info[] = {
 	[0] = {
@@ -583,7 +632,15 @@ static struct bcm_cpu_info bcm215xx_cpu_info[] = {
 		.cpu_clk = "arm11",
 		.appspll_en_clk = "appspll_en",
 		.cpu_regulator = "csr_nm2",
+		.index_osuper = BCM_OSUPER_MODE,
+		.index_super = BCM_SUPER_MODE,
 		.index_turbo = BCM_TURBO_MODE,
+		.index_heigher = BCM_HEIGHER_MODE,
+		.index_omedium = BCM_OMEDIUM_MODE,
+		.index_umedium = BCM_UMEDIUM_MODE,
+		.index_normal = BCM_NORMAL_MODE,
+		.index_starter = BCM_STARTER_MODE,
+		.index_lower = BCM_LOWER_MODE,
 	},
 };
 /* Platform data for BCM CPU freq driver */
@@ -599,6 +656,18 @@ struct platform_device bcm21553_cpufreq_drv = {
 		.platform_data = &bcm21553_cpufreq_drv_plat,
 	},
 };
+
+void __init update_turbo_freq(void)
+{
+	u32 cpu_freq;
+
+	cpu_freq = bcm21553_apps_pll_get_rate();
+	/*cpu_freq = 1024; cpu_freq - ((cpu_freq * 2) / 12); in Hz  */
+	cpu_freq = cpu_freq / 1000 / 1000;				/* in MHz */
+
+	bcm215xx_cpu0_freq_tbl[BCM_SUPER_MODE].cpu_freq = cpu_freq;
+	pr_info("%s: cpu frequency : %u\n", __func__, cpu_freq);
+}
 #endif /* CONFIG_BCM_CPU_FREQ */
 
 #if defined(CONFIG_CPU_FREQ_GOV_BCM21553)
@@ -607,10 +676,15 @@ struct platform_device bcm21553_cpufreq_drv = {
  *********************************************************************/
 
 static struct bcm21553_cpufreq_gov_plat bcm21553_cpufreq_gov_plat = {
-	.freq_turbo = BCM_CORE_CLK_TURBO,
-	.freq_fast = BCM_CORE_CLK_FAST,
-	.freq_normal = BCM_CORE_CLK_NORMAL,
-	.freq_slow = BCM_CORE_CLK_SLOW,
+	.freq_osuper	= BCM_CORE_CLK_OSUPER,
+	.freq_super		= BCM_CORE_CLK_SUPER,
+	.freq_turbo		= BCM_CORE_CLK_TURBO,
+	.freq_heigher	= BCM_CORE_CLK_HEIGHER,
+	.freq_omedium	= BCM_CORE_CLK_OMEDIUM,
+	.freq_umedium	= BCM_CORE_CLK_UMEDIUM,
+	.freq_normal	= BCM_CORE_CLK_NORMAL,
+	.freq_starter	= BCM_CORE_CLK_STARTER,
+	.freq_lower		= BCM_CORE_CLK_LOWER,
 };
 
 struct platform_device bcm21553_cpufreq_gov = {
@@ -627,25 +701,47 @@ struct platform_device bcm21553_cpufreq_gov = {
  *                        DATA FOR AVS DRIVER                        *
  *********************************************************************/
 
-#define NM2_FF_VOLTAGE_SLOW	1100000
-#define NM2_TT_VOLTAGE_SLOW	1140000
-#define NM2_SS_VOLTAGE_SLOW	1180000
+/* THIS IS THE MAN CORE OF OUR VOLTAGE WE NEED TO CRACK IT */
+
+#define NM2_FF_VOLTAGE_LOWER	1100000
+#define NM2_TT_VOLTAGE_LOWER	1120000
+#define NM2_SS_VOLTAGE_LOWER	1160000
+
+#define NM2_FF_VOLTAGE_STARTER	1120000
+#define NM2_TT_VOLTAGE_STARTER	1160000
+#define NM2_SS_VOLTAGE_STARTER	1200000
 
 #define NM2_FF_VOLTAGE_NORMAL	1140000
 #define NM2_TT_VOLTAGE_NORMAL	1180000
-#define NM2_SS_VOLTAGE_NORMAL	1200000
+#define NM2_SS_VOLTAGE_NORMAL	1220000
 
-#define NM2_FF_VOLTAGE_FAST	1180000
-#define NM2_TT_VOLTAGE_FAST	1220000
-#define NM2_SS_VOLTAGE_FAST	1240000
+#define NM2_FF_VOLTAGE_UMEDIUM	1180000
+#define NM2_TT_VOLTAGE_UMEDIUM	1200000
+#define NM2_SS_VOLTAGE_UMEDIUM	1240000
 
-#define NM2_FF_VOLTAGE_TURBO	1200000
-#define NM2_TT_VOLTAGE_TURBO	1240000
-#define NM2_SS_VOLTAGE_TURBO	1260000
+#define NM2_FF_VOLTAGE_OMEDIUM	1200000
+#define NM2_TT_VOLTAGE_OMEDIUM	1240000
+#define NM2_SS_VOLTAGE_OMEDIUM	1280000
 
-#define NM_FF_VOLTAGE		1320000
+#define NM2_FF_VOLTAGE_HEIGHER	1220000
+#define NM2_TT_VOLTAGE_HEIGHER	1280000
+#define NM2_SS_VOLTAGE_HEIGHER	1320000
+
+#define NM2_FF_VOLTAGE_TURBO	1220000
+#define NM2_TT_VOLTAGE_TURBO	1320000
+#define NM2_SS_VOLTAGE_TURBO	1340000
+
+#define NM2_FF_VOLTAGE_SUPER	1280000
+#define NM2_TT_VOLTAGE_SUPER	1340000
+#define NM2_SS_VOLTAGE_SUPER	1360000
+
+#define NM2_FF_VOLTAGE_OSUPER	1320000
+#define NM2_TT_VOLTAGE_OSUPER	1360000
+#define NM2_SS_VOLTAGE_OSUPER	1380000
+
+#define NM_FF_VOLTAGE		1340000
 #define NM_TT_VOLTAGE		1340000
-#define NM_SS_VOLTAGE		1360000
+#define NM_SS_VOLTAGE		1380000
 
 #define FF_THRESHOLD 445
 #define SS_THRESHOLD 395
@@ -653,85 +749,151 @@ struct platform_device bcm21553_cpufreq_gov = {
 static struct silicon_type_info part_type_ss = {
 	.lpm_voltage = -1, /* Pass -1 if no update needed */
 	.nm_voltage = NM_SS_VOLTAGE,
-	.nm2_slow_voltage = NM2_SS_VOLTAGE_SLOW,
+	.nm2_lower_voltage = NM2_SS_VOLTAGE_LOWER,
+	.nm2_starter_voltage = NM2_SS_VOLTAGE_STARTER,
 	.nm2_normal_voltage = NM2_SS_VOLTAGE_NORMAL,
-	.nm2_fast_voltage = NM2_SS_VOLTAGE_FAST,
+	.nm2_umedium_voltage = NM2_SS_VOLTAGE_UMEDIUM,
+	.nm2_omedium_voltage = NM2_SS_VOLTAGE_OMEDIUM,
+	.nm2_heigher_voltage = NM2_SS_VOLTAGE_HEIGHER,
 	.nm2_turbo_voltage = NM2_SS_VOLTAGE_TURBO,
+	.nm2_super_voltage = NM2_SS_VOLTAGE_SUPER,
+	.nm2_osuper_voltage = NM2_SS_VOLTAGE_OSUPER,
 };
 
 static struct silicon_type_info part_type_tt = {
 	.lpm_voltage = -1, /* Pass -1 if no update needed */
 	.nm_voltage = NM_TT_VOLTAGE,
-	.nm2_slow_voltage = NM2_TT_VOLTAGE_SLOW,
+	.nm2_lower_voltage = NM2_TT_VOLTAGE_LOWER,
+	.nm2_starter_voltage = NM2_TT_VOLTAGE_STARTER,
 	.nm2_normal_voltage = NM2_TT_VOLTAGE_NORMAL,
-	.nm2_fast_voltage = NM2_TT_VOLTAGE_FAST,
+	.nm2_umedium_voltage = NM2_TT_VOLTAGE_UMEDIUM,
+	.nm2_omedium_voltage = NM2_TT_VOLTAGE_OMEDIUM,
+	.nm2_heigher_voltage = NM2_TT_VOLTAGE_HEIGHER,
 	.nm2_turbo_voltage = NM2_TT_VOLTAGE_TURBO,
+	.nm2_super_voltage = NM2_TT_VOLTAGE_SUPER,
+	.nm2_osuper_voltage = NM2_TT_VOLTAGE_OSUPER,
 };
 
 static struct silicon_type_info part_type_ff = {
 	.lpm_voltage = -1, /* Pass -1 if no update needed */
 	.nm_voltage = NM_FF_VOLTAGE,
-	.nm2_slow_voltage = NM2_FF_VOLTAGE_SLOW,
+	.nm2_lower_voltage = NM2_FF_VOLTAGE_LOWER,
+	.nm2_starter_voltage = NM2_FF_VOLTAGE_STARTER,
 	.nm2_normal_voltage = NM2_FF_VOLTAGE_NORMAL,
-	.nm2_fast_voltage = NM2_FF_VOLTAGE_FAST,
+	.nm2_umedium_voltage = NM2_FF_VOLTAGE_UMEDIUM,
+	.nm2_omedium_voltage = NM2_FF_VOLTAGE_OMEDIUM,
+	.nm2_heigher_voltage = NM2_FF_VOLTAGE_HEIGHER,
 	.nm2_turbo_voltage = NM2_FF_VOLTAGE_TURBO,
+	.nm2_super_voltage = NM2_FF_VOLTAGE_SUPER,
+	.nm2_osuper_voltage = NM2_FF_VOLTAGE_OSUPER,
 };
 
 #ifdef CONFIG_BCM_CPU_FREQ
 /* If cpufreq is enabled, this callback updates the voltages
- * for the normal and turbo modes in the cpufreq driver
+ * for the normal and osuper modes in the cpufreq driver
  * voltage-to-frequency mapping table.
  */
 static void bcm215xx_avs_notify(int silicon_type)
 {
-	int slow;
+	int lower;
+	int starter;
 	int normal;
-	int fast;
+	int umedium;
+	int omedium;
+	int heigher;
 	int turbo;
+	int super;
+	int osuper;
 
 	pr_info("%s: silicon_type : %d\n", __func__, silicon_type);
 
 	switch(silicon_type)
 	{
 	case SILICON_TYPE_SLOW:
-		slow = part_type_ss.nm2_slow_voltage;
-		normal = part_type_ss.nm2_normal_voltage;
-		fast = part_type_ss.nm2_fast_voltage;
-		turbo = part_type_ss.nm2_turbo_voltage;
+		lower	= part_type_ss.nm2_lower_voltage;
+		starter	= part_type_ss.nm2_starter_voltage;
+		normal	= part_type_ss.nm2_normal_voltage;
+		umedium	= part_type_ss.nm2_umedium_voltage;
+		omedium	= part_type_ss.nm2_omedium_voltage;
+		heigher	= part_type_ss.nm2_heigher_voltage;
+		turbo	= part_type_ss.nm2_turbo_voltage;
+		super	= part_type_ss.nm2_super_voltage;
+		osuper	= part_type_ss.nm2_osuper_voltage;
 		break;
 
 	case SILICON_TYPE_TYPICAL:
-		slow = part_type_tt.nm2_slow_voltage;
-		normal = part_type_tt.nm2_normal_voltage;
-		fast = part_type_tt.nm2_fast_voltage;
-		turbo = part_type_tt.nm2_turbo_voltage;
+		lower	= part_type_tt.nm2_lower_voltage;
+		starter	= part_type_tt.nm2_starter_voltage;
+		normal	= part_type_tt.nm2_normal_voltage;
+		umedium	= part_type_tt.nm2_umedium_voltage;
+		omedium	= part_type_tt.nm2_omedium_voltage;
+		heigher	= part_type_tt.nm2_heigher_voltage;
+		turbo	= part_type_tt.nm2_turbo_voltage;
+		super	= part_type_tt.nm2_super_voltage;
+		osuper	= part_type_tt.nm2_osuper_voltage;
 		break;
 
 	case SILICON_TYPE_FAST:
-		slow = part_type_ff.nm2_slow_voltage;
-		normal = part_type_ff.nm2_normal_voltage;
-		fast = part_type_ff.nm2_fast_voltage;
-		turbo = part_type_ff.nm2_turbo_voltage;
+		lower	= part_type_ff.nm2_lower_voltage;
+		starter	= part_type_ff.nm2_starter_voltage;
+		normal	= part_type_ff.nm2_normal_voltage;
+		umedium	= part_type_ff.nm2_umedium_voltage;
+		omedium	= part_type_ff.nm2_omedium_voltage;
+		heigher	= part_type_ff.nm2_heigher_voltage;
+		turbo	= part_type_ff.nm2_turbo_voltage;
+		super	= part_type_ff.nm2_super_voltage;
+		osuper	= part_type_ff.nm2_osuper_voltage;
 		break;
 
 	default:
-		slow = part_type_ss.nm2_slow_voltage;
-		normal = part_type_ss.nm2_normal_voltage;
-		fast = part_type_ss.nm2_fast_voltage;
-		turbo = part_type_ss.nm2_turbo_voltage;
+		lower	= part_type_ss.nm2_lower_voltage;
+		starter	= part_type_ss.nm2_starter_voltage;
+		normal	= part_type_ss.nm2_normal_voltage;
+		umedium	= part_type_ss.nm2_umedium_voltage;
+		omedium	= part_type_ss.nm2_omedium_voltage;
+		heigher	= part_type_ss.nm2_heigher_voltage;
+		turbo	= part_type_ss.nm2_turbo_voltage;
+		super	= part_type_ss.nm2_super_voltage;
+		osuper	= part_type_ss.nm2_osuper_voltage;
 		break;
+
 	}
 
-	{
-		bcm215xx_cpu0_freq_tbl[BCM_SLOW_MODE].cpu_voltage =
-			1140000;
+	if (lower > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_LOWER_MODE].cpu_voltage =
+		  (u32)lower;
+
+	if (starter > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_STARTER_MODE].cpu_voltage =
+		  (u32)starter;
+
+	if (normal > 0)
 		bcm215xx_cpu0_freq_tbl[BCM_NORMAL_MODE].cpu_voltage =
-			1180000;
-		bcm215xx_cpu0_freq_tbl[BCM_FAST_MODE].cpu_voltage =
-			1220000;
+		  (u32)normal;
+
+	if (umedium > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_UMEDIUM_MODE].cpu_voltage =
+		  (u32)umedium;
+
+	if (omedium > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_OMEDIUM_MODE].cpu_voltage =
+		  (u32)omedium;
+
+	if (heigher > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_HEIGHER_MODE].cpu_voltage =
+		  (u32)heigher;
+
+	if (turbo > 0)
 		bcm215xx_cpu0_freq_tbl[BCM_TURBO_MODE].cpu_voltage =
-			1240000;
-	}
+		  (u32)turbo;
+
+	if (super > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_SUPER_MODE].cpu_voltage =
+		  (u32)super;
+
+	if (osuper > 0)
+		bcm215xx_cpu0_freq_tbl[BCM_OSUPER_MODE].cpu_voltage =
+		  (u32)osuper;
 
 }
 #else
@@ -742,7 +904,15 @@ static struct bcm_avs_platform_data_t bcm_avs_pdata = {
 	/* Pass NULL if not supported/need not update */
 	.core_lpm_regl = NULL,
 	.core_nml_regl = "csr_nm1",
+	.core_lower_regl = "csr_nm2",
+	.core_starter_regl = "csr_nm2",
+	.core_normal_regl = "csr_nm2",
+	.core_omedium_regl = "csr_nm2",
+	.core_umedium_regl = "csr_nm2",
+	.core_heigher_regl = "csr_nm2",
 	.core_turbo_regl = "csr_nm2",
+	.core_super_regl = "csr_nm2",
+	.core_osuper_regl = "csr_nm2",
 
 	.otp_bit_lsb = 169,
 	.otp_bit_msb = 188,
@@ -790,21 +960,41 @@ struct platform_device bcm215xx_avs_device = {
 
 void __init update_avs_sysparm(void)
 {
+	SYSPARM_VOLT("nm2_ff_voltage_osuper", part_type_ff.nm2_osuper_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_osuper", part_type_tt.nm2_osuper_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_osuper", part_type_ss.nm2_osuper_voltage);
+
+	SYSPARM_VOLT("nm2_ff_voltage_super", part_type_ff.nm2_super_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_super", part_type_tt.nm2_super_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_super", part_type_ss.nm2_super_voltage);
+
 	SYSPARM_VOLT("nm2_ff_voltage_turbo", part_type_ff.nm2_turbo_voltage);
 	SYSPARM_VOLT("nm2_tt_voltage_turbo", part_type_tt.nm2_turbo_voltage);
 	SYSPARM_VOLT("nm2_ss_voltage_turbo", part_type_ss.nm2_turbo_voltage);
 
-	SYSPARM_VOLT("nm2_ff_voltage_fast", part_type_ff.nm2_fast_voltage);
-	SYSPARM_VOLT("nm2_tt_voltage_fast", part_type_tt.nm2_fast_voltage);
-	SYSPARM_VOLT("nm2_ss_voltage_fast", part_type_ss.nm2_fast_voltage);
+	SYSPARM_VOLT("nm2_ff_voltage_heigher", part_type_ff.nm2_heigher_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_heigher", part_type_tt.nm2_heigher_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_heigher", part_type_ss.nm2_heigher_voltage);
+
+	SYSPARM_VOLT("nm2_ff_voltage_omedium", part_type_ff.nm2_omedium_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_omedium", part_type_tt.nm2_omedium_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_omedium", part_type_ss.nm2_omedium_voltage);
+
+	SYSPARM_VOLT("nm2_ff_voltage_umedium", part_type_ff.nm2_umedium_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_umedium", part_type_tt.nm2_umedium_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_umedium", part_type_ss.nm2_umedium_voltage);
 
 	SYSPARM_VOLT("nm2_ff_voltage_normal", part_type_ff.nm2_normal_voltage);
 	SYSPARM_VOLT("nm2_tt_voltage_normal", part_type_tt.nm2_normal_voltage);
 	SYSPARM_VOLT("nm2_ss_voltage_normal", part_type_ss.nm2_normal_voltage);
 
-	SYSPARM_VOLT("nm2_ff_voltage_slow", part_type_ff.nm2_slow_voltage);
-	SYSPARM_VOLT("nm2_tt_voltage_slow", part_type_tt.nm2_slow_voltage);
-	SYSPARM_VOLT("nm2_ss_voltage_slow", part_type_ss.nm2_slow_voltage);
+	SYSPARM_VOLT("nm2_ff_voltage_starter", part_type_ff.nm2_starter_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_starter", part_type_tt.nm2_starter_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_starter", part_type_ss.nm2_starter_voltage);
+
+	SYSPARM_VOLT("nm2_ff_voltage_lower", part_type_ff.nm2_lower_voltage);
+	SYSPARM_VOLT("nm2_tt_voltage_lower", part_type_tt.nm2_lower_voltage);
+	SYSPARM_VOLT("nm2_ss_voltage_lower", part_type_ss.nm2_lower_voltage);
 
 	SYSPARM_VOLT("nm_ff_voltage", part_type_ff.nm_voltage);
 	SYSPARM_VOLT("nm_tt_voltage", part_type_tt.nm_voltage);

@@ -173,5 +173,9 @@ config BCM21553_V3D_SYNC_ENABLE
 config HEADSET_DET_GPIO
 	bool "Samsung BCM2155x LUISA 0_2 board Headset"
 
+config BCM21553_1GHZ
+	bool "Enable support for 1GHz BCM21553 part"
+	depends on ARCH_BCM215XX
+	default y
 
 endmenu
