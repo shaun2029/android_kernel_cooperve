@@ -1,11 +1,32 @@
 #!/bin/bash
 
-mkdir -p ramdisk/data
-mkdir -p ramdisk/dev
-mkdir -p ramdisk/lib/modules
-mkdir -p ramdisk/proc
-mkdir -p ramdisk/sys
-mkdir -p ramdisk/system
-mkdir -p ramdisk/tmp
+chmod -R 750 ramdisk/*
+	chmod 755 ramdisk/sbin
+	chmod 6755 ramdisk/sbin/su-bin
+
+	chmod 755 ramdisk/lib
+		chmod 755 ramdisk/lib/modules
+		chmod 744 ramdisk/lib/modules/*
+	
+	chmod 755 ramdisk/res
+	chmod 744 ramdisk/res/*
+		chmod 755 ramdisk/res/images
+		chmod 744 ramdisk/res/images/*
+			chmod 755 ramdisk/res/images/240x320
+			chmod 744 ramdisk/res/images/240x320/*
+	
+mkdir -p -m 755 ramdisk/data
+mkdir -p -m 755 ramdisk/dev
+mkdir -p -m 755 ramdisk/proc
+mkdir -p -m 755 ramdisk/sys
+mkdir -p -m 755 ramdisk/system
+mkdir -p -m 755 ramdisk/tmp
+
+chmod 755 ramdisk/data
+chmod 755 ramdisk/dev
+chmod 755 ramdisk/proc
+chmod 755 ramdisk/sys
+chmod 755 ramdisk/system
+chmod 755 ramdisk/tmp
 
 cd ./ramdisk/ && rm ../boot.img-ramdisk.cpio.lzma; clear; sleep 5; find . | cpio -o -H newc | lzma > ../boot.img-ramdisk.cpio.lzma
