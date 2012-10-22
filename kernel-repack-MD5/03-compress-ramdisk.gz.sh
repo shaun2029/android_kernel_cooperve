@@ -9,11 +9,11 @@ chmod -R 750 ramdisk/*
 		chmod 744 ramdisk/lib/modules/*
 	
 	chmod 755 ramdisk/res
-	chmod 744 ramdisk/res/*
+	chmod 644 ramdisk/res/*
 		chmod 755 ramdisk/res/images
-		chmod 744 ramdisk/res/images/*
+		chmod 644 ramdisk/res/images/*
 			chmod 755 ramdisk/res/images/240x320
-			chmod 744 ramdisk/res/images/240x320/*
+			chmod 644 ramdisk/res/images/240x320/*
 	
 mkdir -p -m 755 ramdisk/data
 mkdir -p -m 755 ramdisk/dev
