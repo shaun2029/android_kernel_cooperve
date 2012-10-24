@@ -2,6 +2,7 @@
 
 chmod -R 750 ramdisk/*
 	chmod 755 ramdisk/sbin
+	chmod 4755 ramdisk/sbin/sqlite3
 	chmod 6755 ramdisk/sbin/su-bin
 
 	chmod 755 ramdisk/lib
