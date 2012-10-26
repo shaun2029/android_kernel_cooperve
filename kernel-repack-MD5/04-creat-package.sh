@@ -53,12 +53,15 @@ if [ -f ../boot.img-ramdisk.cpio.lzma ] && [ -f ../boot.img-kernel ]; then
 fi
 
 if [ -f run.sh ] && [ -f md5 ]; then
-	rm ../boot.img ../*-boot.img.tar ../*-boot.img-modules.zip; clear; sleep 5
+	rm ../boot.img ../*-boot.img.tar ../*-modules.zip ../*-boot.img.zip; clear; sleep 5
 	chmod +x run.sh mkbootimg && ./run.sh && rm run.sh md5
 	cd ..
-	tar -cvf PDA-boot.img.tar boot.img && mv boot.img CWM_kernel/ && cd CWM_kernel && zip -r ../CWM-boot.img-modules.zip . ;
+	tar -cvf PDA-boot.img.tar boot.img && mv boot.img CWM_kernel/ && cd CWM_kernel && zip -r ../CWM-boot.img.zip . ;
 	cd ..
-	mv CWM-boot.img-modules.zip ../$(cat ../common/.version)-CWM-boot.img-modules.zip && 	echo "$(cat ../common/.version)-CWM-kernel-modules.zip <-> READY"
+	cd CWM_modules && zip -r ../CWM-modules.zip . ;
+	cd ..
+	mv CWM-boot.img.zip ../$(cat ../common/.version)-CWM-boot.img.zip && echo "$(cat ../common/.version)-CWM-boot.img.zip <-> READY"
+	mv CWM-modules.zip ../$(cat ../common/.version)-CWM-modules.zip && echo "$(cat ../common/.version)-CWM-modules.zip <-> READY"
 	mv PDA-boot.img.tar ../$(cat ../common/.version)-PDA-boot.img.tar && echo "$(cat ../common/.version)-PDA-boot.img.tar <-> READY"
 else
 	echo "boot.img creation - Faill"; sleep 5; exit

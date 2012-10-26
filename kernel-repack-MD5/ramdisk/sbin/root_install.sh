@@ -1,4 +1,4 @@
-#!/sbin/busybox sh
+#!/sbin/sh
 
 bbdir="/system/bin /system/sbin" ; 
 ndeletes=0 ; 
