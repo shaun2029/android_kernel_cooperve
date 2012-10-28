@@ -2,7 +2,6 @@
 
 chmod -R 750 ramdisk/*
 	chmod 755 ramdisk/sbin
-	chmod 644 ramdisk/sbin/recovery.fstab
 	chmod 4755 ramdisk/sbin/sqlite3
 	chmod 6755 ramdisk/sbin/su-bin
 
@@ -14,8 +13,6 @@ chmod -R 750 ramdisk/*
 	chmod 644 ramdisk/res/*
 		chmod 755 ramdisk/res/images
 		chmod 644 ramdisk/res/images/*
-			chmod 755 ramdisk/res/images/240x320
-			chmod 644 ramdisk/res/images/240x320/*
 	
 mkdir -p -m 755 ramdisk/data
 mkdir -p -m 755 ramdisk/dev

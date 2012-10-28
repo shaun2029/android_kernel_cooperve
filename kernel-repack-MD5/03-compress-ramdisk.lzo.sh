@@ -28,4 +28,4 @@ chmod 755 ramdisk/sys
 chmod 755 ramdisk/system
 chmod 755 ramdisk/tmp
 
-cd ./ramdisk/ && rm ../boot.img-ramdisk.cpio.gz; clear; sleep 5; find . | cpio -o -H newc | gzip > ../boot.img-ramdisk.cpio.gz
+cd ./ramdisk/ && rm ../boot.img-ramdisk.cpio.lzo; clear; sleep 5; find . | cpio -o -H newc | lzop > ../boot.img-ramdisk.cpio.lzo

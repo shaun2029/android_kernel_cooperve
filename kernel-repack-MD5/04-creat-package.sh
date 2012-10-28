@@ -10,12 +10,13 @@ else
 	test boot.img-kernel && touch k-ok
 fi
 
-if [ -f boot.img-ramdisk.cpio.gz ] || [ -f boot.img-ramdisk.cpio.gz ]; then
-	if [ -f boot.img-ramdisk.cpio.gz ] && [ -f boot.img-ramdisk.cpio.gz ]; then
+if [ -f boot.img-ramdisk.cpio.gz ] || [ -f boot.img-ramdisk.cpio.lzma ] || [ -f boot.img-ramdisk.cpio.lzo ]; then
+	if [ -f boot.img-ramdisk.cpio.gz ] && [ -f boot.img-ramdisk.cpio.lzma ] && [ -f boot.img-ramdisk.cpio.lzo ]; then
 		echo "TWO RAMDISK NOT SOPPORTED!";
 		sleep 5; exit
 	fi
 	test boot.img-ramdisk.cpio.gz && echo "RAMDISK in cpio.gz	- Good!"; touch r-ok
+	test boot.img-ramdisk.cpio.lzo && echo "RAMDISK in cpio.lzo	- Good!"; touch r-ok
 	test boot.img-ramdisk.cpio.lzma && echo "RAMDISK in cpio.lzma	- Good!"; touch r-ok
 else
 	if [ -d ramdisk ]; then
@@ -43,6 +44,13 @@ if [ -f ../boot.img-ramdisk.cpio.gz ] && [ -f ../boot.img-kernel ]; then
 	echo './mkbootimg --kernel ../boot.img-kernel --kernelMD5 ' > run.sh
 	dd if=md5 of=run.sh bs=1 seek=52 count=32
 	echo ' --ramdisk ../boot.img-ramdisk.cpio.gz --base 0x81600000 -o ../boot.img' >> run.sh
+fi
+
+if [ -f ../boot.img-ramdisk.cpio.lzo ] && [ -f ../boot.img-kernel ]; then
+	md5sum ../boot.img-kernel > md5
+	echo './mkbootimg --kernel ../boot.img-kernel --kernelMD5 ' > run.sh
+	dd if=md5 of=run.sh bs=1 seek=52 count=32
+	echo ' --ramdisk ../boot.img-ramdisk.cpio.lzo --base 0x81600000 -o ../boot.img' >> run.sh
 fi
 
 if [ -f ../boot.img-ramdisk.cpio.lzma ] && [ -f ../boot.img-kernel ]; then
