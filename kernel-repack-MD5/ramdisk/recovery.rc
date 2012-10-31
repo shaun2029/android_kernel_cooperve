@@ -3,7 +3,7 @@ on early-init
 
 on init
     export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
-    export LD_LIBRARY_PATH /vendor/lib:/system/lib
+    export LD_LIBRARY_PATH /sbin/lib:/vendor/lib:/system/lib
     export ANDROID_ROOT /system
     export ANDROID_DATA /data
     export EXTERNAL_STORAGE /sdcard
@@ -35,20 +35,28 @@ on early-fs
 
 on fs
     mount tmpfs tmpfs /tmp
+
+    exec /sbin/tune2fs -O ^has_journal /dev/stl9
+    exec /sbin/tune2fs -O ^has_journal /dev/stl10
+    exec /sbin/tune2fs -O ^has_journal /dev/stl11
+
+    exec /sbin/busybox sleep 1
+
+    exec /sbin/e2fsck -y /dev/stl9
+    exec /sbin/e2fsck -y /dev/stl10
+    exec /sbin/e2fsck -y /dev/stl11
+
+    exec /sbin/busybox sleep 1
+
     mount rfs /dev/block/stl9 /system check=no
-    mount ext4 /dev/block/stl9 /system
-
-# /data is moved to 'on emmc' and 'on nand' sections
-    mount rfs /dev/block/stl11 /data nosuid nodev check=no
-    mount ext4 /dev/block/stl11 /data nosuid nodev
-
-# /cache
     mount rfs /dev/block/stl10 /cache nosuid nodev
-    mount ext4 /dev/block/stl10 /cache nosuid nodev
+    mount rfs /dev/block/stl11 /data nosuid nodev check=no
 
-# /system rw first to give the filesystem a chance to save a checkpoint
-    mount rfs /dev/block/stl9 /system rw remount ckeck=no
-    mount ext4 /dev/block/stl9 /system rw remount
+    exec /sbin/busybox sleep 1
+
+    mount ext4 /dev/stl9 /system
+    mount ext4 /dev/stl10 /cache nosuid nodev
+    mount ext4 /dev/stl11 /data nosuid nodev
 
 on post-fs
     write /proc/sys/kernel/panic_on_oops 1

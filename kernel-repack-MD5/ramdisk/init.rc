@@ -174,27 +174,34 @@ loglevel 3
 
 on fs
 # mount mtd partitions
-# Mount /system rw first to give the filesystem a chance to save a checkpoint
+    exec /sbin/tune2fs -O ^has_journal /dev/stl9
+    exec /sbin/tune2fs -O ^has_journal /dev/stl10
+    exec /sbin/tune2fs -O ^has_journal /dev/stl11
+
+    exec /sbin/busybox sleep 1
+
     exec /sbin/e2fsck -y /dev/stl9
+    exec /sbin/e2fsck -y /dev/stl10
+    exec /sbin/e2fsck -y /dev/stl11
+
+    exec /sbin/busybox sleep 1
+
     mount rfs /dev/block/stl9 /system check=no
+    exec /sbin/busybox sleep 1
     mount ext4 /dev/stl9 /system nodelalloc
 
-# execute root and busybox installer
     exec /sbin/busybox sh /sbin/root_install.sh
 
-# /data is moved to 'on emmc' and 'on nand' sections
-    exec /sbin/e2fsck -y /dev/stl11
+    mount rfs /dev/block/stl10 /cache nosuid nodev
     mount rfs /dev/block/stl11 /data nosuid nodev check=no
+
+    exec /sbin/busybox sleep 1
+
+    mount ext4 /dev/stl10 /cache nosuid nodev nodelalloc
     mount ext4 /dev/stl11 /data nosuid nodev nodelalloc
 
-# /cache
-    exec /sbin/e2fsck -y /dev/stl10
-    mount rfs /dev/block/stl10 /cache nosuid nodev
-    mount ext4 /dev/stl10 /cache nosuid nodev nodelalloc
-
-# /system ro prevent filesystem changes
-    exec /sbin/e2fsck -y /dev/stl9
     mount rfs /dev/block/stl9 /system ro remount
+    exec /sbin/busybox sleep 1
     mount ext4 /dev/stl9 /system ro remount nodelalloc
 
 #J4FS module

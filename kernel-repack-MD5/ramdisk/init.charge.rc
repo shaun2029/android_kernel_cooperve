@@ -89,25 +89,27 @@ loglevel 1
 
 on fs
 # mount mtd partitions
-# Mount /system rw first to give the filesystem a chance to save a checkpoint
+    exec /sbin/tune2fs -O ^has_journal /dev/stl9
+    exec /sbin/tune2fs -O ^has_journal /dev/stl10
+    exec /sbin/tune2fs -O ^has_journal /dev/stl11
+
+    exec /sbin/busybox sleep 1
+
     exec /sbin/e2fsck -y /dev/stl9
-    mount rfs /dev/block/stl9 /system check=no
-    mount ext4 /dev/stl9 /system nodelalloc
-
-# /data is moved to 'on emmc' and 'on nand' sections
-    exec /sbin/e2fsck -y /dev/stl11
-    mount rfs /dev/block/stl11 /data nosuid nodev check=no
-    mount ext4 /dev/stl11 /data nosuid nodev nodelalloc
-
-# /cache
     exec /sbin/e2fsck -y /dev/stl10
-    mount rfs /dev/block/stl10 /cache nosuid nodev
-    mount ext4 /dev/stl10 /cache nosuid nodev nodelalloc
+    exec /sbin/e2fsck -y /dev/stl11
 
-# /system ro prevent filesystem changes
-    exec /sbin/e2fsck -y /dev/stl9
-    mount rfs /dev/block/stl9 /system ro remount
-    mount ext4 /dev/stl9 /system ro remount nodelalloc
+    exec /sbin/busybox sleep 1
+
+    mount rfs /dev/block/stl9 /system check=no
+    mount rfs /dev/block/stl10 /cache nosuid nodev
+    mount rfs /dev/block/stl11 /data nosuid nodev check=no
+
+    exec /sbin/busybox sleep 1
+
+    mount ext4 /dev/stl9 /system nodelalloc
+    mount ext4 /dev/stl10 /cache nosuid nodev nodelalloc
+    mount ext4 /dev/stl11 /data nosuid nodev nodelalloc
 
 on post-fs
     # once everything is setup, no need to modify /
