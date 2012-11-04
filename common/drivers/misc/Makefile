@@ -49,6 +49,7 @@ obj-$(CONFIG_SENSORS_MMC328X) += mmc328x.o mecs.o
 obj-$(CONFIG_INPUT_YAS_MAGNETOMETER) += yas_mag_kernel_driver.o   
 obj-$(CONFIG_INPUT_YAS_ACCELEROMETER) += yas_acc_kernel_driver.o  
 obj-$(CONFIG_INPUT_YAS_ORIENTATION) += yas_ori_kernel_driver.o 
+obj-$(CONFIG_BLX)		+= blx.o
 obj-$(CONFIG_MAX8986_AUDIO)	+= max8986-audio.o
 obj-$(CONFIG_BCM59035_PWM)	+= bcm59035_pwm.o
 obj-$(CONFIG_MAX8986_MUIC)	+= max8986-muic.o

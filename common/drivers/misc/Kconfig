@@ -523,6 +523,12 @@ config INPUT_YAS_ACCELEROMETER_POSITION
 config INPUT_YAS_ORIENTATION
 	tristate "YAS Orientation Sensor"
 	depends on I2C
+
+config BLX
+	bool "Support for Battery Life eXtender"
+	default y
+	help
+	Say Y to enable Battery Life eXtender
 	  
 config MAX8986_AUDIO
 	tristate "MAX8986 audio driver"
