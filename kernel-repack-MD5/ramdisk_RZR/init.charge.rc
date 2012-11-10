@@ -95,9 +95,9 @@ on fs
 
     exec /sbin/busybox sleep 1
 
-    exec /sbin/e2fsck -y /dev/stl9
-    exec /sbin/e2fsck -y /dev/stl10
-    exec /sbin/e2fsck -y /dev/stl11
+    exec /sbin/e2fsck -p /dev/stl9
+    exec /sbin/e2fsck -p /dev/stl10
+    exec /sbin/e2fsck -p /dev/stl11
 
     exec /sbin/busybox sleep 1
 
