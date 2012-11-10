@@ -271,9 +271,9 @@ static unsigned int bcm_cpufreq_get_speed(unsigned int cpu)
 	/* cpufreq core expects clock frequency in kHz */
 	rate = clk_get_rate(b->cpu_clk) / 1000;
 
-	if (IS_FLOW_DBG_ENABLED)
+	if (IS_FLOW_DBG_ENABLED) {
 		pr_debug("%s: cur cpu speed: %u\n", __func__, rate);
-
+	}
 	return rate;
 }
 
