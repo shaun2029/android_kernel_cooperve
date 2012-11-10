@@ -29,8 +29,8 @@
  * It helps to keep variable names smaller, simpler
  */
 
-#define DEF_FREQUENCY_UP_THRESHOLD		(75)
-#define DEF_FREQUENCY_DOWN_THRESHOLD		(50)
+#define DEF_FREQUENCY_UP_THRESHOLD		(95)
+#define DEF_FREQUENCY_DOWN_THRESHOLD		(40)
 
 /*
  * The polling frequency of this governor depends on the capability of
@@ -51,7 +51,7 @@ static unsigned int min_sampling_rate;
 #define DEF_SAMPLING_DOWN_FACTOR		(2)
 #define MAX_SAMPLING_DOWN_FACTOR		(10)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)
-#define DEFAULT_FREQUENCY_STEP			(15)
+#define DEFAULT_FREQUENCY_STEP			(10)
 
 static void do_dbs_timer(struct work_struct *work);
 
