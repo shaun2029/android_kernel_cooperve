@@ -206,8 +206,6 @@ chmod 0771 /efs
 
 # SEC_SECURITYLAB_LATONA_DEVICE_ENCRYPTION: add crypt option
 # We chown/chmod /data again so because mount is run as root + defaults
-    exec /sbin/e2fsck -y /dev/stl11
-    mount ext4 /dev/stl11 /data remount nosuid nodev crypt nodelalloc
     mount rfs /dev/block/stl11 /data remount nosuid nodev crypt
     chown system system /data
     chmod 0771 /data    

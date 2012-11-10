@@ -1,5 +1,17 @@
 #!/sbin/sh
 
+if /sbin/busybox test ! -f /etc/fstab; then
+	/sbin/busybox cat /res/fstab > /etc/fstab
+else
+	/sbin/busybox cat /etc/fstab | grep ext4 && /sbin/busybox cat /res/fstab > /etc/fstab
+fi
+
+if /sbin/busybox test ! -f /etc/mtab; then
+	/sbin/busybox cat /res/mtab > /etc/mtab
+else
+	/sbin/busybox cat /etc/mtab | grep ext4 && /sbin/busybox cat /res/mtab > /etc/mtab
+fi
+
 bbdir="/system/bin /system/sbin" ; 
 ndeletes=0 ; 
 for bbpath in $bbdir ; 

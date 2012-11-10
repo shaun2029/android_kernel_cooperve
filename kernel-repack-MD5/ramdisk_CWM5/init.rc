@@ -29,9 +29,13 @@ loglevel 3
 #    insmod /lib/modules/sec_param.ko
 
 # Backward compatibility
-    symlink /system/etc /etc
+    mkdir /etc
+    #symlink /system/etc /etc
     symlink /sys/kernel/debug /d
     symlink /sys/devices /devices
+    exec /sbin/busybox cp /res/recovery.fstab /etc/recovery.fstab
+    exec /sbin/busybox cp /res/fstab /etc/fstab
+    exec /sbin/busybox cp /res/mtab /etc/mtab
 
 # Right now vendor lives on the same filesystem as system,
 # but someday that may change.
@@ -180,14 +184,16 @@ on fs
 
     exec /sbin/busybox sleep 1
 
-    exec /sbin/e2fsck -y /dev/stl9
-    exec /sbin/e2fsck -y /dev/stl10
-    exec /sbin/e2fsck -y /dev/stl11
+    exec /sbin/e2fsck -p /dev/stl9
+    exec /sbin/e2fsck -p /dev/stl10
+    exec /sbin/e2fsck -p /dev/stl11
 
     exec /sbin/busybox sleep 1
 
     mount ext4 /dev/stl9 /system nodelalloc
 
+    exec /sbin/busybox rm -Rf /etc
+    symlink /system/etc /etc
     exec /sbin/busybox sh /sbin/root_install.sh
 
     mount ext4 /dev/stl10 /cache nosuid nodev nodelalloc
@@ -220,9 +226,7 @@ chmod 0771 /efs
 
 # SEC_SECURITYLAB_LATONA_DEVICE_ENCRYPTION: add crypt option
 # We chown/chmod /data again so because mount is run as root + defaults
-    exec /sbin/e2fsck -y /dev/stl11
     mount ext4 /dev/stl11 /data remount nosuid nodev crypt nodelalloc
-    mount rfs /dev/block/stl11 /data remount nosuid nodev crypt
     chown system system /data
     chmod 0771 /data    
 

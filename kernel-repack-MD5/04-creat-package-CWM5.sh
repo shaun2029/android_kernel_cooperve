@@ -20,7 +20,7 @@ if [ -f boot.img-ramdisk.cpio.gz ] || [ -f boot.img-ramdisk.cpio.lzma ] || [ -f 
 	test boot.img-ramdisk.cpio.lzma && echo "RAMDISK in cpio.lzma	- Good!"; touch r-ok
 else
 	rm -Rf ramdisk
-	ln -s ramdisk_CWM ramdisk
+	ln -s ramdisk_CWM5 ramdisk
 	if [ -d ramdisk ]; then
 		echo "CREATING RAMDISK";
 		./03-compress-ramdisk.lzma.sh
@@ -66,14 +66,14 @@ if [ -f run.sh ] && [ -f md5 ]; then
 	rm ../kernel/boot.img ../boot.img ../*-boot.img.tar ../*-modules.zip ../*-boot.img.zip; clear; sleep 5
 	chmod +x run.sh mkbootimg && ./run.sh && rm run.sh md5
 	cd ..
-	tar -cvf CWM-PDA-boot.img.tar boot.img && mv boot.img kernel/ && cd kernel && zip -r ../CWM-boot.img.zip . ;
+	tar -cvf CWM5-PDA-boot.img.tar boot.img && mv boot.img kernel/ && cd kernel && zip -r ../CWM5-boot.img.zip . ;
 	cd ..
-	mv CWM-boot.img.zip ../$(cat ../common/.version)-CWM-boot.img.zip && echo "$(cat ../common/.version)-CWM-boot.img.zip <-> READY"
-	mv CWM-PDA-boot.img.tar ../$(cat ../common/.version)-CWM-PDA-boot.img.tar && echo "$(cat ../common/.version)-CWM-PDA-boot.img.tar <-> READY"
+	mv CWM5-boot.img.zip ../$(cat ../common/.version)-CWM5-boot.img.zip && echo "$(cat ../common/.version)-CWM5-boot.img.zip <-> READY"
+	mv CWM5-PDA-boot.img.tar ../$(cat ../common/.version)-CWM5-PDA-boot.img.tar && echo "$(cat ../common/.version)-CWM5-PDA-boot.img.tar <-> READY"
 else
 	echo "boot.img creation - Faill"; sleep 5; exit
 fi
 
-echo "CWM DONE";
+echo "CWM5 DONE";
 
 sleep 5
