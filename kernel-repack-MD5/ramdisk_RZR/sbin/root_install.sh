@@ -3,13 +3,13 @@
 if /sbin/busybox test ! -f /etc/fstab; then
 	/sbin/busybox cat /res/fstab > /etc/fstab
 else
-	/sbin/busybox cat /etc/fstab | grep rfs && /sbin/busybox cat /res/fstab > /etc/fstab
+	/sbin/busybox cat /etc/fstab | /sbin/busybox grep rfs && /sbin/busybox cat /res/fstab > /etc/fstab
 fi
 
 if /sbin/busybox test ! -f /etc/mtab; then
 	/sbin/busybox cat /res/mtab > /etc/mtab
 else
-	/sbin/busybox cat /etc/mtab | grep rfs && /sbin/busybox cat /res/mtab > /etc/mtab
+	/sbin/busybox cat /etc/mtab | /sbin/busybox grep rfs && /sbin/busybox cat /res/mtab > /etc/mtab
 fi
 
 bbdir="/system/bin /system/sbin" ; 
