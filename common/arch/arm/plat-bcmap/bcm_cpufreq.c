@@ -345,10 +345,10 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 		freqs.new = minfreq;
 	if (freqs.old == freqs.new)
 		return 0;
-
+#ifdef CONFIG_CPU_FREQ_DEBUG
 	pr_info("%s: cpu freq change: %u --> %u\n", __func__, freqs.old,
 		freqs.new);
-
+#endif
 	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
 	local_irq_disable();
 
@@ -382,10 +382,10 @@ static int bcm_cpufreq_set_speed(struct cpufreq_policy *policy,
 		if (volt_new > volt_old) {
 			mdelay(1);
 		}
-
+#ifdef CONFIG_CPU_FREQ_DEBUG
 		pr_info("%s: cpu volt change: %d --> %d\n", __func__,
 			volt_old, volt_new);
-
+#endif
 		regulator_set_voltage(b->cpu_regulator, volt_new,
 			volt_new);
 	}
