@@ -37,8 +37,8 @@ config LOGO_BLACKFIN_CLUT224
 	depends on BLACKFIN
 	default y
 
-config LOGO_LINUX_BCM2157
-	bool "Broadcom BCM2157 224-color Linux logo"
+config LOGO_LINUX_RAFAEL
+	bool "RafaelBaugis 224-color Linux logo"
 	depends on LOGO
 	default n
 
