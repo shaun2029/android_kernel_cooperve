@@ -20,8 +20,7 @@
 #define MEMALLOC_SIZE   (SZ_4M)
 #else
 #if defined (CONFIG_BMEM)
-/*#define MEMALLOC_SIZE  (4096)*/
-#define MEMALLOC_SIZE  (1024*1024*6)
+#define MEMALLOC_SIZE  (4096)
 #else
 #define MEMALLOC_SIZE  (1024*1024*6)
 #endif

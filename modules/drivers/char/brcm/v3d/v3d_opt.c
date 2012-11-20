@@ -62,7 +62,7 @@ the GPL, without Broadcom's express prior written consent.
 /* Job Error Handling variables */
 #define V3D_JOB_CACHE_CLEAR
 #ifdef V3D_JOB_CACHE_CLEAR
-#define V3D_ISR_TIMEOUT_IN_MS	(750)
+#define V3D_ISR_TIMEOUT_IN_MS	(250)
 #define V3D_CACHE_MAX_RETRIES	(1)
 #define V3D_JOB_TIMEOUT_IN_MS	(V3D_ISR_TIMEOUT_IN_MS * (V3D_CACHE_MAX_RETRIES+1))
 #else
