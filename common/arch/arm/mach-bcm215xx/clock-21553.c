@@ -602,10 +602,10 @@ int bcm21553_arm11_set_rate(struct clk *clk, unsigned long val)
 	arm11_freq[3] = (apps_pll_freq*2)/3;	//832Mhz TURBO
 
 
-	/*we support only modes 0x09 0x0C 0x0E 0x0F*/
+	/*we support only modes 0x0A 0x0C 0x0E 0x0F*/
 	if (val == arm11_freq[0])
 	{
-		mode = 0x09;
+		mode = 0x0A;
 	}
 	else if (val == arm11_freq[1])
 	{

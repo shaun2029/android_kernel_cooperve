@@ -6,7 +6,7 @@ export CC=arm-linux-gnueabi-gcc
 export CXX=arm-linux-gnueabi-g++
 export ARCH=arm
 
-cd common && make mrproper && touch ../clear
+cd common && make clean && make mrproper && make distclean && touch ../clear
 cd ..
 if [ -f clear ]; then
 	rm clear
