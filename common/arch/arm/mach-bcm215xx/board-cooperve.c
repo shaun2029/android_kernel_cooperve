@@ -151,7 +151,6 @@
 #include <linux/usb/android.h>
 #endif
 
-#define FREQ_MHZ(ghz)		((ghz)*1000UL*1000UL*1000UL)
 #define FREQ_MHZ(mhz)		((mhz)*1000UL*1000UL)
 #define FREQ_KHZ(khz)		((khz)*1000UL)
 
@@ -477,7 +476,7 @@ static struct wifi_mem_prealloc wifi_mem_array[PREALLOC_WLAN_SEC_NUM] = {
        {NULL, (WLAN_SECTION_SIZE_0 + PREALLOC_WLAN_SECTION_HEADER)},
        {NULL, (WLAN_SECTION_SIZE_1 + PREALLOC_WLAN_SECTION_HEADER)},
        {NULL, (WLAN_SECTION_SIZE_2 + PREALLOC_WLAN_SECTION_HEADER)},
-       {NULL, (WLAN_SECTION_SIZE_3 + PREALLOC_WLAN_SECTION_HEADER)},
+       {NULL, (WLAN_SECTION_SIZE_3 + PREALLOC_WLAN_SECTION_HEADER)}
 };
 
 void *wlan_mem_prealloc(int section, unsigned long size)

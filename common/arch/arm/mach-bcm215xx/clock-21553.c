@@ -73,7 +73,6 @@
 		.clk = &BRCM_CLK_NAME(clock),\
 	}
 
-#define FREQ_GHZ(ghz)		((ghz)*1000UL*1000UL*1000UL)
 #define FREQ_MHZ(mhz)		((mhz)*1000UL*1000UL)
 #define FREQ_KHZ(khz)		((khz)*1000UL)
 
