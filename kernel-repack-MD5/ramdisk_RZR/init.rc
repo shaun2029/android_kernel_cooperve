@@ -843,7 +843,6 @@ on property:encryption.bootmode=remount
     # mount rfs /dev/block/mmcblk0p3 /data nosuid nodev usedm check=no,iocharset=utf8
     # mount yaffs2 mtd@userdata /data nosuid nodev
     mount ext4 /dev/stl11 /data nosuid nodev usedm nodelalloc
-    mount rfs /dev/block/stl11 /data nosuid nodev usedm
     chown system system /data
     chmod 0771 /data
 
