@@ -166,6 +166,12 @@ config CPU_FREQ_DEFAULT_GOV_LIONHEART
        help
          Use the CPUFreq governor 'Lionheart' as default.
 
+config CPU_FREQ_DEFAULT_GOV_LIONHEARTX
+       bool "lionheartx"
+       select CPU_FREQ_GOV_LIONHEARTX
+       help
+         Use the CPUFreq governor 'Lionheartx' as default.
+
 config CPU_FREQ_DEFAULT_GOV_ONDEMANDX
        bool "ondemandx"
        select CPU_FREQ_GOV_ONDEMANDX
@@ -383,6 +389,20 @@ config CPU_FREQ_GOV_LIONHEART_INPUT
        bool "Ramp up CPU frequency on input events"
        default y
        depends on CPU_FREQ_GOV_LIONHEART
+       help
+         Enable installation of an input event handler which will ramp up the
+         CPU to max frequency when an input event is received.
+
+config CPU_FREQ_GOV_LIONHEARTX
+       tristate "'Lionheartx' cpufreq governor"
+       depends on CPU_FREQ
+       help
+         'Lionheartx' - A brave and agile conservative-based governor.
+
+config CPU_FREQ_GOV_LIONHEARTX_INPUT
+       bool "Ramp up CPU frequency on input events"
+       default y
+       depends on CPU_FREQ_GOV_LIONHEARTX
        help
          Enable installation of an input event handler which will ramp up the
          CPU to max frequency when an input event is received.

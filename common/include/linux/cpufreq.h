@@ -402,6 +402,10 @@ extern struct cpufreq_governor cpufreq_gov_scary;
 extern struct cpufreq_governor cpufreq_gov_lionheart;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_lionheart)
 
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_LIONHEARTX)
+extern struct cpufreq_governor cpufreq_gov_lionheartx;
+#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_lionheartx)
+
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMANDX)
 extern struct cpufreq_governor cpufreq_gov_ondemandx;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_ondemandx)
